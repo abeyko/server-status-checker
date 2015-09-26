@@ -10,7 +10,7 @@ $(document).ready(function() {
       $flag.remove();
     }
 
-    if ($flag.length == 0 || !$flag.is('.valid')) {
+    if ($flag.length == 0 && $flag.is('.valid')) {
       $input.after('<div class="valid"></div>');
     }
 
