@@ -38,3 +38,16 @@ h4 {
 	top: 40%;
 	transform: translateY(-40%);
 }
+
+h5 {
+	font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+	font-size: 35px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 60.3999996185303px;
+	text-align: center;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
