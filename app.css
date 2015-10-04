@@ -1,0 +1,27 @@
+
+html { 
+  background: url(b2.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+
+h1 {
+	margin-top: 30px;
+}
+#rcorners1 {
+	font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 15.3999996185303px;
+	font-size: 20px;
+	background-color:rgba(95,158,160,0.5);
+	display: inline;
+    border-radius: 25px;
+    padding: 20px; 
+    width: 200px;
+    height: 12px; 
+}
