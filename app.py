@@ -4,7 +4,7 @@ import os
 class App():
 	@cherrypy.expose
 	def index(self):
-		return open("/Users/Angeliki/Desktop/icon_test/index.html",'r').read()
+		return open("/Users/Angeliki/Desktop/icon_test/public/index.html",'r').read()
 
 if __name__ == '__main__':
 	conf = {
@@ -17,4 +17,5 @@ if __name__ == '__main__':
 		 'tools.staticdir.dir': './public'
 	 }
 	}
+	
 cherrypy.quickstart(App(), '/', conf)
