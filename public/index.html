@@ -11,7 +11,6 @@
 	-->
 	</STYLE>	
 	<link href="/static/css/style.css" rel="stylesheet">
-	<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">
 </head>
 
 <body>
@@ -34,26 +33,7 @@
 				<input class="left" id="field" name="field">
 				<br/>
 				<input type="submit" value="Validate!">
-				</form>
-				<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-				<script src="http://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
-				<script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
-				<script>
-				// just for the demos, avoids form submit
-				jQuery.validator.setDefaults({
-					debug: true,
-					success: "valid"
-				});
-				$( "#myform" ).validate({
-					rules: {
-						field: {
-							required: true,
-							url: true
-						}
-					}
-				});
-				</script>
-				
+				</form>	
 			</h2>
 		</h1>
 <!-- Add break or cushion between boxes along vertical axis -->
@@ -158,6 +138,9 @@
 	</html>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<script type="text/javascript" src="icon_test.js"></script>
-
+	<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+	<script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+	<script type="text/javascript" src="/static/app.js"></script>
 </body>
