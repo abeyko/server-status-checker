@@ -11,20 +11,49 @@
 	-->
 	</STYLE>	
 	<link href="/static/css/style.css" rel="stylesheet">
+	<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">
 </head>
 
 <body>
 	<html>
 		<h1>
 			<h2>
+			<!--
 				<form action="addSite" method="GET">
 				<div id="rcorners1" style="color: #FFFFFF">
 				Add Site:
 				<input type="name" name="name">
 				<input type="submit" value="Submit" />
-				<!-- value="submit" changes the submit query button in firefox to just submit -->
+				 value="submit" changes the submit query button in firefox to just submit 
 				</form>
 				</div>
+				-->
+
+				<form id="myform">
+				<label for="field">Required URL: </label>
+				<input class="left" id="field" name="field">
+				<br/>
+				<input type="submit" value="Validate!">
+				</form>
+				<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+				<script src="http://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+				<script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+				<script>
+				// just for the demos, avoids form submit
+				jQuery.validator.setDefaults({
+					debug: true,
+					success: "valid"
+				});
+				$( "#myform" ).validate({
+					rules: {
+						field: {
+							required: true,
+							url: true
+						}
+					}
+				});
+				</script>
+				
 			</h2>
 		</h1>
 <!-- Add break or cushion between boxes along vertical axis -->
