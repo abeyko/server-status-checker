@@ -2,7 +2,6 @@
 <!-- Comment Here -->
 <!DOCTYPE =html>
 <head>
-	
 	<title> Web App Monitoring Dashboard </title>
 <!-- Gets rid of underline in hyperlinks -->
 	<STYLE>
@@ -11,12 +10,12 @@
 	-->
 	</STYLE>	
 	<link href="/static/css/style.css" rel="stylesheet">
+	<script type="text/javascript" src="/media/jquery-1.4.2.min.js"></script>
 </head>
 
 <body>
 	<html>
 		<h1>
-
 			<h2>
 				<form id="myform">
 				<div id="rcorners1" style="color: #FFFFFF">Add Site: 
@@ -24,6 +23,7 @@
 				<input type="submit" value="Validate / Submit"/>
 				</form>
 				</div>
+				<button>getthedata</button> 
 			</h2>
 		</h1>
 <!-- Add break or cushion between boxes along vertical axis -->
@@ -42,7 +42,7 @@
 						<td><a href="http://www.amazon.com" style="color: #FFFFFF">Amazon.com</a></td>
 						<td>Up / Down Arrow</td>
 						<td>Last checked 2 seconds ago</td>
-						<td>Weekly Stats</td>
+						<td><div id='res'></div></td>
 					</tr>
 					<tr>
 						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Dropbox-icon.png"></td>

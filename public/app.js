@@ -12,3 +12,19 @@ $( "#myform" ).validate({
 		}
 	}
 });
+
+$(document).ready(function()
+  {
+    $('button').on('click', function()
+    {
+      var request = $.ajax({'url': '/getData'});
+      request.done(function(response) 
+      {
+        $('#res').text(response.res);
+      });
+      request.fail(function(jqXHR, textStatus) 
+      {
+        alert('Request failed: ' + textStatus);
+      });
+    })
+  });
