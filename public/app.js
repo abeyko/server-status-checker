@@ -15,8 +15,8 @@ $( "#myform" ).validate({
 
 $(document).ready(function()
   {
-    $('button').on('click', function()
-    {
+   // $('button').on('click', function()
+   // {
       var request = $.ajax({'url': '/getData'});
       request.done(function(response) 
       {
@@ -27,4 +27,4 @@ $(document).ready(function()
         alert('Request failed: ' + textStatus);
       });
     })
-  });
+  //});
