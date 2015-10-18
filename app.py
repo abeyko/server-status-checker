@@ -12,15 +12,26 @@ class Root():
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def getData(self):
+		res = list()
 		global db
 		db=MySQLdb.connect(host="localhost", user="root", passwd="password", db="popular_sites")
 		c = db.cursor()
-		c.execute('SELECT count(*) FROM popular_sites')
+		c.execute('SELECT site_url FROM popular_sites')
 		res = c.fetchall()
-		res = ','.join(str(r) for r in res)
-		c.close
+		res = list(res)
+		c.close()
+		ser = []
+		for item in res:
+
+			response = os.system("ping -c 1 " + item[0])
+			
+			if response == 0:
+				ser.append("is up! :D")				
+			else:
+				ser.append("is down! :'(")				
+
 		return {
-			'res' : res
+			'res' : ser
 		}
 	
 

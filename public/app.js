@@ -15,16 +15,14 @@ $( "#myform" ).validate({
 
 $(document).ready(function()
   {
-   // $('button').on('click', function()
-   // {
-      var request = $.ajax({'url': '/getData'});
-      request.done(function(response) 
-      {
-        $('#res').text(response.res);
-      });
-      request.fail(function(jqXHR, textStatus) 
-      {
-        alert('Request failed: ' + textStatus);
-      });
-    })
-  //});
+    var request = $.ajax({'url': '/getData'});
+    request.done(function(response) 
+    { for(i=0; i < 8; i++){
+      $('#' + i).text(response.res[i]);
+    }
+    });
+    request.fail(function(jqXHR, textStatus) 
+    {
+      alert('Request failed: ' + textStatus);
+    });
+  })
