@@ -1,9 +1,6 @@
 import cherrypy
 import os
 import MySQLdb
-import urllib
-import httplib
-import urllib2
 import requests
 
 
@@ -16,7 +13,7 @@ class Root():
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def getData(self):
+    def get_data(self):
         res = list()
         global db
         db = MySQLdb.connect(
@@ -29,29 +26,20 @@ class Root():
         c.close()
         ser = []
         for item in res:
-
-            ping_response = os.system("ping -c 1 -W 5 " + item[0]) #should set a timeout for ping
-            
-            newitem = 'http://' + item[0] # method 3 works!
-            response = requests.get(newitem) # method 3 works!
-            response.history #(<Response [302]>, <Response[302]>, <Response [302]>) # method 3 works!
-            #for resp in response.history: # method 3 works!
-            	#print resp.status_code, resp.url # method 3 works!
-            #print response.status_code, response.url # method 3 works!
-            #print response.status_code # method 3 works!
+            ping_response = os.system("ping -c 1 -W 5 " + item[0])
+            new_item = 'http://' + item[0]
+            response = requests.get(new_item)
+            response.history
             http_response = response.status_code
-
- 
+            print response.status_code, response.url
+            # how to handle error 503?
             if ping_response == 0 or http_response == 200:
-            	ser.append("is up! :D")
+                ser.append(u"\u2705")
             else:
-                ser.append("is down! :'(")
-
+                ser.append(u"\u274e")
         return {
             'res': ser
         }
-
-
 if __name__ == '__main__':
     conf = {
         '/': {

@@ -15,7 +15,7 @@ $( "#myform" ).validate({
 
 $(document).ready(function()
   {
-    var request = $.ajax({'url': '/getData'});
+    var request = $.ajax({'url': '/get_data'});
     request.done(function(response) 
     { for(i=0; i < 8; i++){
       $('#' + i).text(response.res[i]);
