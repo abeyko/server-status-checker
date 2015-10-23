@@ -1,136 +1,190 @@
-<!-- Always include Doctype declaration in the beginning of HTML documents so your browser knows what type of document to expect, it is an instruction to the web browser about what version the page is written in, the declaration refers to a Document Type Definition (DTD) that specifies the rules for the markup language so the browser renders the content correctly -->
-<!-- Comment Here -->
-<!DOCTYPE =html>
+<!DOCTYPE html>
+<html>
 <head>
-	<title> Web App Monitoring Dashboard </title>
-<!-- Gets rid of underline in hyperlinks -->
-	<STYLE>
-	<!--
-	A{text-decoration:none}
-	-->
-	</STYLE>	
-	<link href="/static/css/style.css" rel="stylesheet">
-	<script type="text/javascript" src="/media/jquery-1.4.2.min.js"></script>
-</head>
+    <title>Web App Monitoring Dashboard</title>
+    <!-- Gets rid of underline in hyperlinks -->
 
+    <style>
+    <!--
+    A{text-decoration:none}
+    -->
+    </style>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="/media/jquery-1.4.2.min.js" type="text/javascript">
+    </script>
+</head>
 <body>
-	<html>
-		<h1>
-			<h2>
-				<form id="myform">
-				<div id="rcorners1" style="color: #FFFFFF">Add Site: 
-				<input class="left" id="field" name="field">
-				<input type="submit" value="Validate / Submit"/>
-				</form>
-				</div>
-				<!-- <button>getthedata</button> -->
-			</h2>
-		</h1>
-<!-- Add break or cushion between boxes along vertical axis -->
-		<br> 
-		</br>
-		<div id="b2">
-			<table cellspacing="2" cellpadding="20" align="center">
-				<thead>
-					<tr>
-						<th colspan="6" style="color: #FFFFFF">Popular Sites:</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Amazon-icon.png"></td>
-						<td><a href="http://www.amazon.com" style="color: #FFFFFF">Amazon.com</a></td>
-						<td>Last checked 2 seconds ago</td> <!--Placeholder content for new feature-->
-						<td><div id='0' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td> <!--Placeholder content for new feature-->
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Dropbox-icon.png"></td>
-						<td><a href="http://www.dropbox.com" style="color: #FFFFFF">Dropbox.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='1' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td> 
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Evernote-icon.png"></td>
-						<td><a href="http://www.evernote.com" style="color: #FFFFFF">Evernote.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='2' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td> 
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Facebook-icon.png"></td>
-						<td><a href="http://www.facebook.com" style="color: #FFFFFF">Facebook.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='3' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td> 
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Flickr-icon.png"></td>
-						<td><a href="http://www.flickr.com" style="color: #FFFFFF">Flickr.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='4' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td> 
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/GitHub-icon.png"></td>
-						<td><a href="http://www.github.com" style="color: #FFFFFF">Github.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='5' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td>
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Instagram-icon.png"></td>
-						<td><a href="http://www.instagram.com" style="color: #FFFFFF">Instagram.com</a></td>
-						<td>Last checked 2 seconds ago</td> 
-						<td><div id='6' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td>
-					</tr>
-					<tr>
-						<td width="64" align="center"><img src="http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/LinkedIn-icon.png"></td>
-						<td><a href="http://www.linkedin.com" style="color: #FFFFFF">Linkedin.com</a></td>
-						<td>Last checked 2 seconds ago</td> <!--Placeholder content for new feature-->
-						<td><div id='7' style="font-size:200%"></div></td>
-						<td>Weekly Stats</td>
-					</tr>
-				</tbody>	
-			</table>
-		</div>
-<!-- Add break or cushion between boxes along vertical axis -->
-		<br> 
-		</br>
-		<div id="b2">
-			<table cellspacing="2" cellpadding="20" align="center">
-				<thead>
-					<tr>
-						<th colspan="6" style="color: #FFFFFF">My Sites:</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>Website</td>
-						<td>Last checked 2 seconds ago</td>
-						<td>Up / Down Status Icon</td>
-						<td>Weekly Stats</td>
-						<td> - </td>
-						
-					</tr>
-					<tr>
-						<td>Website</td>
-						<td>Last checked 2 seconds ago</td>
-						<td>Up / Down Status Icon</td>
-						<td>Weekly Stats</td>
-						<td> - </td>						
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</html>
-	
-	<script defer src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<!--<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">-->
-	<script defer src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script defer src="http://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
-	<script defer src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
-	<script defer type="text/javascript" src="/static/app.js"></script>
+    <h1></h1>
+    <h2></h2>
+    <form action="#" id="testform" method="post" name="testform">
+        <div id="rcorners1" style="color: #FFFFFF">
+            <label for="name">Add Site:</label> <input class="left" id="field"
+            name="field" type="text"> <input type="submit" value="Set">
+        </div>
+    </form><br>
+    <br>
+    <div id="b2">
+        <table align="center" cellpadding="20" cellspacing="2">
+            <thead>
+                <tr>
+                    <th colspan="6" style="color: #FFFFFF">Popular Sites:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Amazon-icon.png"></td>
+                    <td>
+                        <a href="http://www.amazon.com" style=
+                        "color: #FFFFFF">Amazon.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <!--Placeholder content for new feature-->
+                    <td>
+                        <div id='0' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                    <!--Placeholder content for new feature-->
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Dropbox-icon.png"></td>
+                    <td>
+                        <a href="http://www.dropbox.com" style=
+                        "color: #FFFFFF">Dropbox.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='1' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Evernote-icon.png"></td>
+                    <td>
+                        <a href="http://www.evernote.com" style=
+                        "color: #FFFFFF">Evernote.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='2' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Facebook-icon.png"></td>
+                    <td>
+                        <a href="http://www.facebook.com" style=
+                        "color: #FFFFFF">Facebook.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='3' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Flickr-icon.png"></td>
+                    <td>
+                        <a href="http://www.flickr.com" style=
+                        "color: #FFFFFF">Flickr.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='4' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/GitHub-icon.png"></td>
+                    <td>
+                        <a href="http://www.github.com" style=
+                        "color: #FFFFFF">Github.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='5' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/Instagram-icon.png"></td>
+                    <td>
+                        <a href="http://www.instagram.com" style=
+                        "color: #FFFFFF">Instagram.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>
+                        <div id='6' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+                <tr>
+                    <td align="center" width="64"><img src=
+                    "http://icons.iconarchive.com/icons/lunartemplates/modern-social-media-circles/64/LinkedIn-icon.png"></td>
+                    <td>
+                        <a href="http://www.linkedin.com" style=
+                        "color: #FFFFFF">Linkedin.com</a>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <!--Placeholder content for new feature-->
+                    <td>
+                        <div id='7' style="font-size:200%"></div>
+                    </td>
+                    <td>Weekly Stats</td>
+                </tr>
+            </tbody>
+        </table>
+    </div><br>
+    <br>
+    <div id="b2">
+        <table align="center" cellpadding="20" cellspacing="2">
+            <thead>
+                <tr>
+                    <th colspan="6" style="color: #FFFFFF">My Sites:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div id="title">
+                            Text here
+                        </div>
+                    </td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>Up / Down Status Icon</td>
+                    <td>Weekly Stats</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>Website</td>
+                    <td>Last checked 2 seconds ago</td>
+                    <td>Up / Down Status Icon</td>
+                    <td>Weekly Stats</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script defer src=
+    "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
+    </script> 
+    <!--<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">-->
+     
+    <script defer src="http://code.jquery.com/jquery-1.11.1.min.js">
+    </script> 
+    <script defer src=
+    "http://jqueryvalidation.org/files/dist/jquery.validate.min.js">
+    </script> 
+    <script defer src=
+    "http://jqueryvalidation.org/files/dist/additional-methods.min.js">
+    </script> 
+    <script defer src="/static/app.js" type="text/javascript">
+    </script>
 </body>
+</html>

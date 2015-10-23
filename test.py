@@ -1,10 +1,13 @@
 import cherrypy
+import webbrowser
 import os
+import simplejson
 import MySQLdb
 import requests
+import sys
 
 
-class Root():
+class AjaxApp(object):
 
     @cherrypy.expose
     def index(self):
@@ -40,6 +43,12 @@ class Root():
         return {
             'res': ser
         }
+
+    @cherrypy.expose
+    def submit(self, name):
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        return simplejson.dumps(dict(title="Hello, %s" % name))
+
 if __name__ == '__main__':
     conf = {
         '/': {
@@ -52,4 +61,4 @@ if __name__ == '__main__':
         }
     }
 
-cherrypy.quickstart(Root(), '/', conf)
+cherrypy.quickstart(AjaxApp(), '/', conf)
