@@ -2,34 +2,20 @@
 <html>
 <head>
     <title>Web App Monitoring Dashboard</title>
-    <!-- Gets rid of underline in hyperlinks -->
-
-    <style>
-    <!--
-    A{text-decoration:none}
-    -->
-    </style>
     <link href="/static/css/style.css" rel="stylesheet">
-    <script src="/media/jquery-1.4.2.min.js" type="text/javascript">
-    </script>
 </head>
 <body>
-    <h1></h1>
-    <h2></h2>
     <form action="#" id="testform" method="post" name="testform">
-        <div id="rcorners1" style="color: #FFFFFF">
+        <div id="rcorners1">
             <label for="name">Add Site:</label> <input class="left" id="field"
             name="field" type="text"> <input type="submit" value="Set">
         </div>
-    </form><br>
-    <br>
+    </form>
     <div id="b2">
         <table align="center" cellpadding="20" cellspacing="2">
-            <thead>
-                <tr>
-                    <th colspan="6" style="color: #FFFFFF">Popular Sites:</th>
-                </tr>
-            </thead>
+            <caption>
+                Popular Sites:
+            </caption>
             <tbody>
                 <tr>
                     <td align="center" width="64"><img src=
@@ -144,11 +130,9 @@
     <br>
     <div id="b2">
         <table align="center" cellpadding="20" cellspacing="2">
-            <thead>
-                <tr>
-                    <th colspan="6" style="color: #FFFFFF">My Sites:</th>
-                </tr>
-            </thead>
+            <caption>
+                My Sites:
+            </caption>
             <tbody>
                 <tr>
                     <td>
@@ -171,11 +155,6 @@
             </tbody>
         </table>
     </div>
-    <script defer src=
-    "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
-    </script> 
-    <!--<link rel="stylesheet" href="http://jqueryvalidation.org/files/demo/site-demos.css">-->
-     
     <script defer src="http://code.jquery.com/jquery-1.11.1.min.js">
     </script> 
     <script defer src=

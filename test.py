@@ -1,17 +1,15 @@
 import cherrypy
-import webbrowser
 import os
 import simplejson
 import MySQLdb
 import requests
-import sys
 
 
 class AjaxApp(object):
 
     @cherrypy.expose
     def index(self):
-        return open("/Users/Angeliki/Desktop/icon_test/public/index.html",
+        return open("./public/index.html",
                     'r').read()
 
     @cherrypy.expose
@@ -32,7 +30,6 @@ class AjaxApp(object):
             ping_response = os.system("ping -c 1 -W 5 " + item[0])
             new_item = 'http://' + item[0]
             response = requests.get(new_item)
-            response.history
             http_response = response.status_code
             print response.status_code, response.url
             # how to handle error 503?
@@ -61,4 +58,4 @@ if __name__ == '__main__':
         }
     }
 
-cherrypy.quickstart(AjaxApp(), '/', conf)
+    cherrypy.quickstart(AjaxApp(), '/', conf)
