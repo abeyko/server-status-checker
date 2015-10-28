@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    // just for the demos, avoids form submit
     jQuery.validator.setDefaults({
         debug: true,
         success: "valid"
@@ -11,6 +10,34 @@ $(document).ready(function() {
                 url: true
             }
         }
+    });
+    var request2 = $.ajax({
+        'url': '/get_tables'
+    });
+    request2.done(function(response) {
+        var double_list = response.site_url;
+        var double_list2 = response.icon_url;
+        var siteUrls = [];
+        var imgUrls = [];
+        var tableString = "";
+        for (i = 0; i < double_list2.length; i++) {
+            siteUrls.push(double_list[i][0]);
+            imgUrls.push(double_list2[i][0]);
+            console.log(typeof(siteUrls[i]))
+            console.log(typeof(imgUrls[i]))
+            tableString +=
+                "<tr><td align=\"center\" width=\"64\">" +
+                "<img src=" + imgUrls[i] +
+                "></td><td style=\"color: #FFFFFF\">" +
+                siteUrls[i] + "</td><td>" +
+                "Last checked 2 seconds ago" + "</td><td id=" +
+                i.toString() +
+                " style=\"font-size:200%\"></td><td>" +
+                "Weekly Stats" + "</td></tr>";
+            console.log(tableString)
+        }
+        document.getElementById("popular_sites").innerHTML =
+            tableString;
     });
     $(function() {
         // When the testform is submitted…
@@ -30,7 +57,8 @@ $(document).ready(function() {
         'url': '/get_data'
     });
     request.done(function(response) {
-        for (i = 0; i < 8; i++) {
+        console.log(response.res.length)
+        for (i = 0; i < response.res.length; i++) {
             $('#' + i).text(response.res[i]);
         }
     });

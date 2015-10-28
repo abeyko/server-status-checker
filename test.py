@@ -1,7 +1,7 @@
 import cherrypy
 import os
 import simplejson
-import MySQLdb
+import sqlite3
 import requests
 
 
@@ -14,25 +14,47 @@ class AjaxApp(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def get_data(self):
-        res = list()
-        global db
-        db = MySQLdb.connect(
-            host="localhost", user="root",
-            passwd="password", db="popular_sites")
-        c = db.cursor()
-        c.execute('SELECT site_url FROM popular_sites')
+    def get_tables(self):
+        conn = sqlite3.connect('my.db')
+        c = conn.cursor()
+        c.execute("SELECT site_url FROM popular_sites")
         res = c.fetchall()
         res = list(res)
+        c.execute("SELECT icon_url FROM popular_sites")
+        res2 = c.fetchall()
+        res2 = list(res2)
+        print "res is a type "
+        print type(res)
+        c.close()
+        return {
+            'site_url': res,
+            'icon_url': res2
+        }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_data(self):
+        conn = sqlite3.connect('my.db')
+        c = conn.cursor()
+        c.execute("SELECT site_url FROM popular_sites")
+        res = c.fetchall()
+        res = list(res)
+        print "res is a type "
+        print type(res)
         c.close()
         ser = []
         for item in res:
-            ping_response = os.system("ping -c 1 -W 5 " + item[0])
-            new_item = 'http://' + item[0]
+            ping_item = item[0]
+            if ping_item.startswith('http://'):
+                ping_item = ping_item[7:]
+                print ping_item
+            print type(item)
+            print type(ping_item[0])
+            ping_response = os.system("ping -c 1 -W 5 " + ping_item)
+            new_item = item[0]
             response = requests.get(new_item)
             http_response = response.status_code
             print response.status_code, response.url
-            # how to handle error 503?
             if ping_response == 0 or http_response == 200:
                 ser.append(u"\u2705")
             else:
@@ -58,4 +80,4 @@ if __name__ == '__main__':
         }
     }
 
-    cherrypy.quickstart(AjaxApp(), '/', conf)
+cherrypy.quickstart(AjaxApp(), '/', conf)
