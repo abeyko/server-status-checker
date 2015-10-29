@@ -3,6 +3,7 @@ import os
 import simplejson
 import sqlite3
 import requests
+import time
 
 
 class AjaxApp(object):
@@ -30,6 +31,29 @@ class AjaxApp(object):
             'site_url': res,
             'icon_url': res2
         }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def get_other_table(self):
+        conn = sqlite3.connect('my.db')
+        c = conn.cursor()
+        c.execute("SELECT site_url FROM my_sites")
+        res3 = c.fetchall()
+        res3 = list(res3)
+        print "res is a type "
+        print type(res3)
+        c.close()
+        return {
+            'site_url': res3
+        }
+
+    @cherrypy.expose
+    def append_my_sites(self, newSite):
+        with sqlite3.connect('my.db') as c:
+            cherrypy.session['ts'] = time.time()
+            c.execute("INSERT INTO my_sites VALUES (?, ?)",
+                      [cherrypy.session.id, newSite])
+            return newSite
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -63,10 +87,6 @@ class AjaxApp(object):
             'res': ser
         }
 
-    @cherrypy.expose
-    def submit(self, name):
-        cherrypy.response.headers['Content-Type'] = 'application/json'
-        return simplejson.dumps(dict(title="Hello, %s" % name))
 
 if __name__ == '__main__':
     conf = {
