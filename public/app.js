@@ -29,18 +29,20 @@ $(document).ready(function() {
         'url': '/get_other_table'
     });
     getMySites.done(function(response) {
-        var bananas = response.site_url;
+        var url_list = response.site_url;
         var siteUrl = [];
+        var j = 0;
         var nTableString = "";
-        for (i = 0; i < bananas.length; i++) {
-            siteUrl.push(bananas[i][0]);
+        for (i = 0; i < url_list.length; i++) {
+            siteUrl.push(url_list[i][0]);
+            j = i + 8;
             console.log(typeof(siteUrl[i]))
             console.log("site url is " + siteUrl[i])
             nTableString +=
                 "<tr><td align=\"center\" width=\"64\" style=\"color: #FFFFFF\">" +
                 siteUrl[i] + "</td><td>" +
                 "Last checked 2 seconds ago" + "</td><td id=" +
-                i.toString() +
+                j.toString() +
                 " style=\"font-size:200%\"></td><td>" +
                 "Weekly Stats" + "</td><td>" + "-" +
                 "</td></tr>";
@@ -49,6 +51,7 @@ $(document).ready(function() {
         document.getElementById("my_sites").innerHTML =
             nTableString;
     });
+    // adds new site to the database, then runs getmysites to refresh table, but that's not working, and then ping everything
     $("#pingThisToo").click(function(e) {
         $.post("/append_my_sites", {
             "newSite": $("input[name='field']").val()

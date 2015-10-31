@@ -13,6 +13,10 @@ class AjaxApp(object):
         return open("./public/index.html",
                     'r').read()
 
+    # This function fetches the 2 columns from the popular_sites
+    # table in my.db and returns 2 lists
+    # JS loops through each list and adds an identifier to each icon and url
+    # in the popular sites list by referencing this function
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_tables(self):
@@ -32,6 +36,10 @@ class AjaxApp(object):
             'icon_url': res2
         }
 
+    # This function fetches 1 column from the my_sites
+    # table in my.db and returns one list
+    # JS loops through each list and adds an identifier to each url in the my
+    # sites list by referencing this function
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_other_table(self):
@@ -47,6 +55,8 @@ class AjaxApp(object):
             'site_url': res3
         }
 
+    # Takes the values submitted via button press and adds it as a new row in
+    # the my_sites table
     @cherrypy.expose
     def append_my_sites(self, newSite):
         with sqlite3.connect('my.db') as c:
@@ -55,19 +65,25 @@ class AjaxApp(object):
                       [cherrypy.session.id, newSite])
             return newSite
 
+    # Pings each url in site_url list from popular_sites table and returns
+    # checkmark or cross wingding depending if the site is up or down
+    # I want it to include both tables now...
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_data(self):
         conn = sqlite3.connect('my.db')
+        print "Connected to my db"
         c = conn.cursor()
         c.execute("SELECT site_url FROM popular_sites")
         res = c.fetchall()
         res = list(res)
-        print "res is a type "
-        print type(res)
+        c.execute("SELECT Site_Url FROM my_sites")
+        res2 = c.fetchall()
+        res2 = list(res2)
         c.close()
         ser = []
-        for item in res:
+        res_joined = res + res2
+        for item in res_joined:
             ping_item = item[0]
             if ping_item.startswith('http://'):
                 ping_item = ping_item[7:]
@@ -75,8 +91,11 @@ class AjaxApp(object):
             print type(item)
             print type(ping_item[0])
             ping_response = os.system("ping -c 1 -W 5 " + ping_item)
+            # try out pythonic version of ping, something compatible for
+            # windows users
             new_item = item[0]
             response = requests.get(new_item)
+            # try to use httplib instead of requests, suppposed to be faster
             http_response = response.status_code
             print response.status_code, response.url
             if ping_response == 0 or http_response == 200:
