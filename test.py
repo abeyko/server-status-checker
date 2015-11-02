@@ -65,6 +65,15 @@ class AjaxApp(object):
                       [cherrypy.session.id, newSite])
             return newSite
 
+    @cherrypy.expose
+    def delete_site(self, the_url):
+        cherrypy.session.pop('ts', None)
+        with sqlite3.connect('my.db') as c:
+            c.execute("DELETE FROM my_sites WHERE Site_Url=?",
+                [the_url])
+            #c.execute("DELETE FROM my_sites WHERE session_id=?",
+                #[cherrypy.session.id])  
+
     # Pings each url in site_url list from popular_sites table and returns
     # checkmark or cross wingding depending if the site is up or down
     # I want it to include both tables now...

@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$//(document).ready(function() {
     var getPopSites = $.ajax({
         'url': '/get_tables'
     });
@@ -25,6 +25,21 @@ $(document).ready(function() {
         document.getElementById("popular_sites").innerHTML =
             tableString;
     });
+
+
+    function delete_the_string(e) {
+        console.log("deleting string")
+        $.post("/delete_site", {
+            "the_url": e
+        }).done(function delete_the_string() {
+            getMySites;
+            pingEverything;
+        });
+        //e.preventDefault();
+        }    
+
+
+
     var getMySites = $.ajax({
         'url': '/get_other_table'
     });
@@ -37,17 +52,19 @@ $(document).ready(function() {
             siteUrl.push(url_list[i][0]);
             j = i + 8;
             console.log(typeof(siteUrl[i]))
-            console.log("site url is " + siteUrl[i])
+            console.log("site url is " + siteUrl[i]) //
             nTableString +=
                 "<tr><td align=\"center\" width=\"64\" style=\"color: #FFFFFF\">" +
                 siteUrl[i] + "</td><td>" +
                 "Last checked 2 seconds ago" + "</td><td id=" +
                 j.toString() +
                 " style=\"font-size:200%\"></td><td>" +
-                "Weekly Stats" + "</td><td>" + "-" +
+                "Weekly Stats" + "</td><td>" + "<button type=\"button\" onclick=\"delete_the_string(&#34;" + siteUrl[i] + "&#34;)\">Delete</button>" + 
                 "</td></tr>";
             console.log(nTableString)
         }
+        // "<div id=\"delete_site\">" + 
+        //        "<button id=\"delete-string\">Delete</button>" + 
         document.getElementById("my_sites").innerHTML =
             nTableString;
     });
@@ -74,4 +91,33 @@ $(document).ready(function() {
     pingEverything.fail(function(jqXHR, textStatus) {
         alert('Request failed: ' + textStatus);
     });
-})
+
+
+
+
+    /*
+    $("#j").click(function(e) {
+        $.post("/delete_site", {
+            "the_url": $("j")
+        }).done(function() {
+            getMySites;
+            pingEverything;
+        });
+        e.preventDefault();
+    });
+    //new code here
+
+    $("#delete-string").click(function(e) {
+        $.ajax({
+            type: "DELETE",
+            url: "/delete_site" // think this needs to be changed, but can't find anything named generator in tut09?
+        })
+        .done(function(){
+            $("#the-string").hide();
+        });
+        e.preventDefault();
+    });
+*/
+
+
+//})
