@@ -13,9 +13,7 @@ class App(object):
                     'r').read()
 
     # This function fetches the 2 columns from the popular_sites
-    # table in my.db and returns 2 lists
-    # JS loops through each list and adds an identifier to each icon and url
-    # in the popular sites list by referencing this function
+    # table in my.db and returns 2 lists (site_url and icon_url)
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_table(self):
@@ -36,9 +34,7 @@ class App(object):
         }
 
     # This function fetches 1 column from the my_sites
-    # table in my.db and returns one list
-    # JS loops through each list and adds an identifier to each url in the my
-    # sites list by referencing this function
+    # table in my.db and returns one list (site_url)
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get_other_table(self):
