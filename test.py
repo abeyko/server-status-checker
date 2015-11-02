@@ -1,12 +1,11 @@
 import cherrypy
 import os
-import simplejson
 import sqlite3
 import requests
 import time
 
 
-class AjaxApp(object):
+class App(object):
 
     @cherrypy.expose
     def index(self):
@@ -19,7 +18,7 @@ class AjaxApp(object):
     # in the popular sites list by referencing this function
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def get_tables(self):
+    def get_table(self):
         conn = sqlite3.connect('my.db')
         c = conn.cursor()
         c.execute("SELECT site_url FROM popular_sites")
@@ -48,8 +47,6 @@ class AjaxApp(object):
         c.execute("SELECT site_url FROM my_sites")
         res3 = c.fetchall()
         res3 = list(res3)
-        print "res is a type "
-        print type(res3)
         c.close()
         return {
             'site_url': res3
@@ -65,14 +62,18 @@ class AjaxApp(object):
                       [cherrypy.session.id, newSite])
             return newSite
 
+    # 'the_url' is found in the JS function 'delete_the_string'
+    # which accepts a parameter 'e'. The function is called in
+    # the html generation for 'my_sites' with siteUrl[i] as the
+    # argument. Thus, each url has its associated 'Delete' button.
+    # Here, it accesses the 'my_sites' table in 'my.db' and deletes
+    # every record where 'Site_Url' = 'the_url' that was associated
+    # with the 'Delete' button press
     @cherrypy.expose
     def delete_site(self, the_url):
-        cherrypy.session.pop('ts', None)
         with sqlite3.connect('my.db') as c:
             c.execute("DELETE FROM my_sites WHERE Site_Url=?",
-                [the_url])
-            #c.execute("DELETE FROM my_sites WHERE session_id=?",
-                #[cherrypy.session.id])  
+                      [the_url])
 
     # Pings each url in site_url list from popular_sites table and returns
     # checkmark or cross wingding depending if the site is up or down
@@ -104,7 +105,7 @@ class AjaxApp(object):
             # windows users
             new_item = item[0]
             response = requests.get(new_item)
-            # try to use httplib instead of requests, suppposed to be faster
+            # try to use httplib instead of requests
             http_response = response.status_code
             print response.status_code, response.url
             if ping_response == 0 or http_response == 200:
@@ -128,4 +129,4 @@ if __name__ == '__main__':
         }
     }
 
-cherrypy.quickstart(AjaxApp(), '/', conf)
+cherrypy.quickstart(App(), '/', conf)
