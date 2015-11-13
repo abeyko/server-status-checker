@@ -72,7 +72,7 @@ class App(object):
                       [the_url])
 
     @cherrypy.expose
-    def resolve_httpredirect(url, depth=0):
+    def resolve_httpredirect(self, url, depth=0):
         headers = {"User-Agent": "firefox"}
         body = ""
         if depth > 10:
@@ -82,6 +82,8 @@ class App(object):
             print "LEVEL: " + str(depth)
             print "URL: " + url
             url = url[7:]
+            if url.endswith('/'):
+                url = url[:-1]
             url = str(url)
             print "URL STRIPPED: " + url
             conn = httplib.HTTPConnection(url)
@@ -95,6 +97,7 @@ class App(object):
             print "URL STRIPPED: " + url
             conn = httplib.HTTPSConnection(url)
 
+        print "url is " + str(url)
         req = conn.request("HEAD", "/", body, headers)
         res = conn.getresponse()
         print "STATUS: " + str(res.status)
@@ -103,13 +106,15 @@ class App(object):
         headers = dict(res.getheaders())
         if 'location' in headers and headers['location'] != url:
             print "NEW LOCATION: " + headers['location']
+            if 'location' in headers and headers['location'] == '/':
+                return "will not pursue"
             print "-----------------------------------------"
-            return resolve_httpredirect(headers['location'], depth + 1)
+            return self.resolve_httpredirect(headers['location'], depth + 1)
         else:
             final_status = str(res.status)
-            return final_status
             print "-----------------FINISH-------------------"
             print " "
+            return final_status
 
     # Pings each url in site_url list from popular_sites table and returns
     # checkmark or cross wingding depending if the site is up or down
@@ -131,17 +136,33 @@ class App(object):
         res_joined = res + res2
         for item in res_joined:
             ping_item = item[0]
+            http_item = item[0]
             if ping_item.startswith('http://'):
                 ping_item = ping_item[7:]
                 print ping_item
             print type(item)
             print type(ping_item[0])
-            ping_response = os.system("ping -c 1 -W 5 " + ping_item)
+            ping_response = os.system("ping -c 1 -W 1 " + ping_item)
+            # app takes 6-7 sec to run with 11 sites
+            # this is after reducing ping wait time from 5 to 1
+            # and after exchanging requests with httplib
+
+            # for same amout of sites
+            # with ping wait time 1 and requests, takes 9-10 sec
+            # app was sped up by ~3 s
+
+            # maybe try multi-threading, with subscribing bus
+            # how many threads are allowed at same time?
+            # something to send out all http requests at once
+            # and sort through them as it gets them
+
             # try out pythonic version of ping, something compatible for
             # windows users
-            test_url = item[0]
-            stat = resolve_httpredirect(testurl, 0)
-            if ping_response == 0 or stat == 200:
+            print type(ping_item)
+            print ping_item
+            test_url = http_item
+            stat = self.resolve_httpredirect(test_url, 0)
+            if ping_response == 0 or (stat != 400 and stat!=404):
                 ser.append(u"\u2705")
             else:
                 ser.append(u"\u274e")
