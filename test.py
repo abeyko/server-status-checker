@@ -111,7 +111,7 @@ class App(object):
             print "-----------------------------------------"
             return self.resolve_httpredirect(headers['location'], depth + 1)
         else:
-            final_status = str(res.status)
+            final_status = res.status
             print "-----------------FINISH-------------------"
             print " "
             return final_status
@@ -162,7 +162,14 @@ class App(object):
             print ping_item
             test_url = http_item
             stat = self.resolve_httpredirect(test_url, 0)
-            if ping_response == 0 or (stat != 400 and stat!=404):
+            print stat
+            print ping_response
+            # anything in 400's is a client side error
+            # amazon neither status check works, how to circumnavigate error
+            # 405?
+            if ping_response == 0 or stat >= 500 or stat <= 399:
+                print stat
+                print ping_response
                 ser.append(u"\u2705")
             else:
                 ser.append(u"\u274e")
