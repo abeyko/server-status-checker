@@ -1,3 +1,11 @@
+function scriptReload(id) {
+        var $el = $('#' + id);
+        console.log('this is el');
+        //console.log(el);
+        $('#' + id).replaceWith('<script id="' + id + '" src="' + $el.prop(
+            'src') + '"><\/script>');
+        console.log('after el');
+    }
 // -------POPULAR SITES-----------
 // gets 2 responses (return values) from 'get_table' function in CherryPy
 // and puts them in their own list
@@ -34,10 +42,31 @@ function delete_the_string(e) {
         $.post("/delete_site", {
             "the_url": e
         }).done(function delete_the_string() {
+            //$('.selected').remove();
             // need to add something to reload the my_sites table upon 
             // clicking the delete button
         });
     }
+    // -------SET BUTTON FUNCTION DEFINED-----------
+    // when the 'Set' button is clicked, the information or input inside 
+    // the text box is posted to the CherryPy function 'append_my_sites', 
+    // which then adds the new site to the database
+$("#pingThisToo").click(function(e) {
+    $.post("/append_my_sites", {
+        "newSite": $("input[name='field']").val()
+    }).done(function() {
+        console.log("this happened");
+        //getMySites();
+        //getMySites.done(response);
+        $("input[name='field']").val('');
+        scriptReload('my_sites');
+        console.log("afer this");
+        //$('<li>').text('New item').appendTo('.items');
+        // add something to clear text box after user input and then 
+        // reload the table part of page upon clicking the Set button
+    });
+    e.preventDefault();
+});
 // -------MY SITES-----------
 // gets 1 response (return value) from 'get_other_table' function 
 // in CherryPy and puts it in a list for the site_urls, then generates
@@ -68,19 +97,6 @@ getMySites.done(function(response) {
         console.log(nTableString)
     }
     document.getElementById("my_sites").innerHTML = nTableString;
-});
-// -------SET BUTTON FUNCTION DEFINED-----------
-// when the 'Set' button is clicked, the information or input inside 
-// the text box is posted to the CherryPy function 'append_my_sites', 
-// which then adds the new site to the database
-$("#pingThisToo").click(function(e) {
-    $.post("/append_my_sites", {
-        "newSite": $("input[name='field']").val()
-    }).done(function() {
-        // add something to clear text box after user input and then 
-        // reload the table part of page upon clicking the Set button
-    });
-    e.preventDefault();
 });
 // -------PING / HTTP THE SITES-----------
 // runs the CherryPy funtion 'get_data' and adds an id to each 
