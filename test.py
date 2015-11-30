@@ -143,19 +143,7 @@ class App(object):
             print type(item)
             print type(ping_item[0])
             ping_response = os.system("ping -c 1 -W 1 " + ping_item)
-            # app takes 6-7 sec to run with 11 sites
-            # this is after reducing ping wait time from 5 to 1
-            # and after exchanging requests with httplib
-
-            # for same amout of sites
-            # with ping wait time 1 and requests, takes 9-10 sec
-            # app was sped up by ~3 s
-
-            # maybe try multi-threading, with subscribing bus
-            # how many threads are allowed at same time?
-            # something to send out all http requests at once
-            # and sort through them as it gets them
-
+            # try multi-threading
             # try out pythonic version of ping, something compatible for
             # windows users
             print type(ping_item)
@@ -167,7 +155,7 @@ class App(object):
             # anything in 400's is a client side error
             # amazon neither status check works, how to circumnavigate error
             # 405?
-            if ping_response == 0 or stat >= 500 or stat <= 399:
+            if ping_response == 0 or stat >= 500 or stat <= 399 or stat == 405:
                 print stat
                 print ping_response
                 ser.append(u"\u2705")
