@@ -1,9 +1,9 @@
 function scriptReload(id) {
         var $el = $('#' + id);
         console.log('this is el');
-        //console.log(el);
-        $('#' + id).replaceWith('<script id="' + id + '" src="' + $el.prop(
-            'src') + '"><\/script>');
+        console.log($el.prop);
+        //$('#' + id).replaceWith('<script id="' + id + '" src="' + $el.prop(
+        //    'src') + '"><\/script>');
         console.log('after el');
     }
 // -------POPULAR SITES-----------
