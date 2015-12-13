@@ -1,16 +1,4 @@
-//function scriptReload(id) {
-//        var $el = $('#' + id);
-//        console.log('this is el');
-//        console.log($el.prop);
-//        //$('#' + id).replaceWith('<script id="' + id + '" src="' + $el.prop(
-        //    'src') + '"><\/script>');
-//        console.log('after el');
-//    }
-// -------POPULAR SITES-----------
-// gets 2 responses (return values) from 'popular_sites_data' function in CherryPy
-// and puts them in their own list
-// one list for site_urls and one list for icon_urls
-// then generates the html with a for loop and displays it via innerHTML 
+/** Gets site_url and icon_url return values from popular_sites_data Python function. */
 var get_popular_sites = $.ajax({
     'url': '/popular_sites_data'
 });
@@ -33,46 +21,27 @@ get_popular_sites.done(function(popular_sites) {
     }
     document.getElementById("popular_sites").innerHTML = table_string;
 });
-// -------DELETE BUTTON FUNCTION DEFINED-----------
-// when the delete_the_string function is called, posts the functions 
-// argument to the CherryPy function 'delete_site'
-// under the key of 'the_url'
+/** Posts site to delete in delete_site Python function. */
 function delete_the_site(site) {
         console.log("deleting string")
         $.post("/delete_site", {
             "delete_site": site
         }).done(function delete_the_site() {
             //$('.selected').remove();
-            // need to add something to reload the my_sites table upon 
-            // clicking the delete button
         });
     }
-    // -------SET BUTTON FUNCTION DEFINED-----------
-    // when the 'Set' button is clicked, the information or input inside 
-    // the text box is posted to the CherryPy function 'append_my_sites', 
-    // which then adds the new site to the database
+    /** Posts site to add in add_site Python function. */
 $("#add_site_button").click(function(add_site_button_clicked) {
-    $.post("/append_to_my_sites", {
+    $.post("/add_site", {
         "add_site": $("input[name='field']").val()
     }).done(function() {
         console.log("new site was added");
-        //getMySites();
-        //getMySites.done(response);
         $("input[name='field']").val('');
-        //scriptReload('my_sites');
-        //console.log("afer this");
         //$('<li>').text('New item').appendTo('.items');
-        // add something to clear text box after user input and then 
-        // reload the table part of page upon clicking the Set button
     });
     add_site_button_clicked.preventDefault();
 });
-// -------MY SITES-----------
-// gets 1 response (return value) from 'get_other_table' function 
-// in CherryPy and puts it in a list for the site_urls, then generates
-// the html with a for loop and displays it via innerHTML. This table
-// has a delete buton associated with each Url via the 
-// delete_the_string function in JS
+/** Gets site_url return values from my_sites_data Python function. */
 var get_my_sites = $.ajax({
     'url': '/my_sites_data'
 });
@@ -98,9 +67,7 @@ get_my_sites.done(function(response) {
     }
     document.getElementById("my_sites").innerHTML = table_string;
 });
-// -------PING / HTTP THE SITES-----------
-// runs the CherryPy funtion 'get_data' and adds an id to each 
-// index for the response list
+/** Gets result return values from site_status Python function. */
 var get_site_status = $.ajax({
     'url': '/site_status'
 });

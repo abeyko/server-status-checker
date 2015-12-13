@@ -12,11 +12,11 @@ class App(object):
         return open("./public/Site Monitoring Dashboard.html",
                     'r').read()
 
-    # This function fetches the 2 columns from the popular_sites
-    # table in sqlite3.db and returns 2 lists (site_url and icon_url)
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def popular_sites_data(self):
+        """Return the site and icon urls
+        of the popular_sites database."""
         connection = sqlite3.connect('sqlite3.db')
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM popular_sites")
@@ -26,53 +26,57 @@ class App(object):
         popular_sites_icon_url_result = connection.fetchall()
         popular_sites_icon_url_result = list(popular_sites_icon_url_result)
         connection.close()
-        # returned res, res2
         return {
             'site_url': popular_sites_site_url_result,
             'icon_url': popular_sites_icon_url_result
         }
 
-    # This function fetches 1 column from the my_sites
-    # table in sqlite3.db and returns one list (site_url)
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def my_sites_data(self):
+        """Return the site urls of the
+        popular_sites database."""
         connection = sqlite3.connect('sqlite3.db')
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM my_sites")
         my_sites_site_url_result = connection.fetchall()
         my_sites_site_url_result = list(my_sites_site_url_result)
         connection.close()
-        # returned res3
         return {
             'site_url': my_sites_site_url_result
         }
 
-    # Takes the values submitted via button press and adds it as a new row in
-    # the my_sites table
     @cherrypy.expose
-    def append_to_my_sites(self, add_site):
+    def add_site(self, add_site):
+        """Add site to my_sites database.
+
+        Keyword arguments:
+        add_site -- the url of the site to be added
+        """
         with sqlite3.connect('sqlite3.db') as connection:
             cherrypy.session['ts'] = time.time()
             connection.execute("INSERT INTO my_sites VALUES (?, ?)",
-                      [cherrypy.session.id, add_site])
-            return add_site
+                               [cherrypy.session.id, add_site])
 
-    # 'the_url' is found in the JS function 'delete_the_string'
-    # which accepts a parameter 'e'. The function is called in
-    # the html generation for 'my_sites' with siteUrl[i] as the
-    # argument. Thus, each url has its associated 'Delete' button.
-    # Here, it accesses the 'my_sites' table in 'sqlite3.db' and deletes
-    # every record where 'Site_Url' = 'the_url' that was associated
-    # with the 'Delete' button press
     @cherrypy.expose
     def delete_site(self, delete_site):
+        """Delete site from my_sites database.
+
+        Keyword arguments:
+        delete_site -- the url of the site to be deleted
+        """
         with sqlite3.connect('sqlite3.db') as connection:
             connection.execute("DELETE FROM my_sites WHERE Site_Url=?",
-                      [delete_site])
+                               [delete_site])
 
     @cherrypy.expose
-    def resolve_httpredirect(self, url, depth=0):
+    def httpredirect(self, url, depth=0):
+        """Handles http redirects. Returns final http status.
+
+        Keyword arguments:
+        url -- the url of the site to request http or https status
+        depth -- the number of times a redirect occured (default 0)
+        """
         headers = {"User-Agent": "firefox"}
         body = ""
         if depth > 10:
@@ -109,19 +113,18 @@ class App(object):
             if 'location' in headers and headers['location'] == '/':
                 return "will not pursue"
             print "-----------------------------------------"
-            return self.resolve_httpredirect(headers['location'], depth + 1)
+            return self.httpredirect(headers['location'], depth + 1)
         else:
             final_status = response.status
             print "-----------------FINISH-------------------"
             print " "
             return final_status
 
-    # Pings each url in site_url list from popular_sites table and returns
-    # checkmark or cross wingding depending if the site is up or down
-    # I want it to include both tables now...
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def site_status(self):
+        """Return the status icon after checking each url
+        in the popular_sites and my_sites tables."""
         connection = sqlite3.connect('sqlite3.db')
         print "Connected to sqlite3 db"
         connection = connection.cursor()
@@ -133,22 +136,24 @@ class App(object):
         my_sites_site_url_result = list(my_sites_site_url_result)
         connection.close()
         result_list = []
-        merged_db_tables = popular_sites_site_url_result + my_sites_site_url_result
+        merged_db_tables = popular_sites_site_url_result + \
+            my_sites_site_url_result
         for item in merged_db_tables:
             ping_item = item[0]
             http_item = item[0]
             if ping_item.startswith('http://'):
                 ping_item = ping_item[7:]
             ping_response = os.system("ping -c 1 -W 1 " + ping_item)
-            #test_url = http_item
-            http_status = self.resolve_httpredirect(http_item, 0)
-            if ping_response == 0 or http_status >= 500 or http_status <= 399 or http_status == 405:
+            http_status = self.httpredirect(http_item, 0)
+            if ping_response == 0 \
+                    or http_status >= 500 or \
+                    http_status <= 399 or \
+                    http_status == 405:
                 print http_status
                 print ping_response
                 result_list.append(u"\u2705")
             else:
                 result_list.append(u"\u274e")
-                #res used to return ser
         return {
             'result': result_list
         }
