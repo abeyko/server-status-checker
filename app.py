@@ -21,10 +21,8 @@ class App(object):
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM popular_sites")
         popular_sites_site_url_result = connection.fetchall()
-        popular_sites_site_url_result = list(popular_sites_site_url_result)
         connection.execute("SELECT icon_url FROM popular_sites")
         popular_sites_icon_url_result = connection.fetchall()
-        popular_sites_icon_url_result = list(popular_sites_icon_url_result)
         connection.close()
         return {
             'site_url': popular_sites_site_url_result,
@@ -40,7 +38,6 @@ class App(object):
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM my_sites")
         my_sites_site_url_result = connection.fetchall()
-        my_sites_site_url_result = list(my_sites_site_url_result)
         connection.close()
         return {
             'site_url': my_sites_site_url_result
@@ -130,10 +127,8 @@ class App(object):
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM popular_sites")
         popular_sites_site_url_result = connection.fetchall()
-        popular_sites_site_url_result = list(popular_sites_site_url_result)
         connection.execute("SELECT site_url FROM my_sites")
         my_sites_site_url_result = connection.fetchall()
-        my_sites_site_url_result = list(my_sites_site_url_result)
         connection.close()
         result_list = []
         merged_db_tables = popular_sites_site_url_result + \
