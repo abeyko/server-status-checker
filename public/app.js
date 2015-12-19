@@ -17,17 +17,18 @@ get_popular_sites.done(function(popular_sites) {
             "</td><td>" + "Last checked 2 seconds ago" + "</td><td id=" +
             i.toString() + " style=\"font-size:200%\"></td><td>" +
             "Weekly Stats" + "</td></tr>";
-        console.log(table_string)
+        //console.log(table_string)
     }
     document.getElementById("popular_sites").innerHTML = table_string;
 });
 /** Posts site to delete in delete_site Python function. */
-function delete_the_site(site) {
+function delete_the_site(site, site_url) {
         console.log("deleting string")
         $.post("/delete_site", {
             "delete_site": site
         }).done(function delete_the_site() {
-            //$('.selected').remove();
+            $("tr").remove(":contains(\'" + site_url + "\')");
+            console.log("." + site_url);
         });
     }
     /** Posts site to add in add_site Python function. */
@@ -53,16 +54,15 @@ get_my_sites.done(function(response) {
     for (i = 0; i < url_list.length; i++) {
         site_urls.push(url_list[i][0]);
         j = i + 8;
-        console.log(typeof(site_urls[i]))
-        console.log("site url is " + site_urls[i]) //
-        table_string +=
-            "<tr><td align=\"center\" width=\"64\" style=\"color: #FFFFFF\">" +
+        table_string += "<tr class=\"" + j.toString() +
+            "\"><td align=\"center\" width=\"64\" style=\"color: #FFFFFF\">" +
             site_urls[i] + "</td><td>" + "Last checked 2 seconds ago" +
             "</td><td id=" + j.toString() +
             " style=\"font-size:200%\"></td><td>" + "Weekly Stats" +
             "</td><td>" +
             "<button type=\"button\" onclick=\"delete_the_site(&#34;" +
-            site_urls[i] + "&#34;)\">Delete</button>" + "</td></tr>";
+            site_urls[i] + "&#34;, &#34;" + site_urls[i] +
+            "&#34;)\">Delete</button>" + "</td></tr>";
         console.log(table_string)
     }
     document.getElementById("my_sites").innerHTML = table_string;
