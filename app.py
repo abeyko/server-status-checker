@@ -11,6 +11,41 @@ class App(object):
     def index(self):
         return open("./public/Site Monitoring Dashboard.html",
                     'r').read()
+    @cherrypy.expose
+    def read_table(self, tables, table_columns):
+        """Return the site and icon urls
+        of the popular_sites and my_sites
+        tables in the sqlite3.db database."""
+        # remember to do something about timestamp, do it python side
+        # every time you ping, you add a new timestamp for that same site id
+        tables = ["popular_sites", "my_sites"]
+        table_columns = ["site_url", "icon_url"]
+        variables = {'popular_sites_urls', 'popular_sites_icons', 'my_sites_urls', 'my_sites_icons'}
+        print tables
+        print table_columns
+        connection = sqlite3.connect('sqlite3.db')
+        connection = connection.cursor()
+
+        for table in tables:
+            for column in table_columns:
+                for item in dictionary:
+                    connection.execute("SELECT %s from %s" % column, table_type)
+                    item = connection.fetchall()
+                    print table
+                    print column
+                    print item
+        connection.close()
+        return {
+            'popular_sites_urls': popular_sites_urls,
+            'popular_sites_icons': popular_sites_icons,
+            'my_sites_urls': my_sites_urls,
+            'my_sites_icons': my_sites_icons
+        }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def update(self, table_type):
+        hi = "hi"
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -51,7 +86,6 @@ class App(object):
         add_site -- the url of the site to be added
         """
         with sqlite3.connect('sqlite3.db') as connection:
-            #cherrypy.session['ts'] = time.time()
             connection.execute("INSERT INTO my_sites(site_url) VALUES (?)",
                                [add_site])
 
@@ -123,7 +157,7 @@ class App(object):
         """Return the status icon after checking each url
         in the popular_sites and my_sites tables."""
         connection = sqlite3.connect('sqlite3.db')
-        print "Connected to sqlite3 db via site_status"
+        print "Connected to sqlite3 db via App class"
         connection = connection.cursor()
         connection.execute("SELECT site_url FROM popular_sites")
         popular_sites_site_url_result = connection.fetchall()
@@ -180,12 +214,16 @@ class Site(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def add_site(self, add_site):
-        hi = "hi"
+        self.update(added_site)
+        connection.execute("INSERT INTO my_sites(site_url) VALUES (?)",
+                   [added_site])
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def delete_site(self, delete_site):
-        hi = "hi"
+        self.update(deleted_site)
+        connection.execute("DELETE FROM my_sites WHERE Site_Url=?",
+                   [deleted_site])
 
     @cherrypy.expose
     def icon_upload(self):
@@ -198,34 +236,7 @@ class Database(object):
     def __init__(self):
         print "Database class is accessible"
         self.connection = sqlite3.connect('sqlite3.db')
-        print "Connected to sqlite3 db via site_status"
-
-    """
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def read(self, table_type):
-        #Return the site and icon urls
-        #of the popular_sites and my_sites
-        #tables in the sqlite3.db database.
-        # put all select statments here
-        # certain urls may not have an icon uploaded, but
-        # should still make space for them!
-        # if no icon exists, should not be an error
-        connection = connection.cursor()
-        connection.execute("SELECT site_url FROM popular_sites")
-        popular_sites_site_url_result = connection.fetchall()
-        connection.execute("SELECT icon_url FROM popular_sites")
-        popular_sites_icon_url_result = connection.fetchall()
-        connection.close()
-        return {
-            'site_url': popular_sites_site_url_result,
-            'icon_url': popular_sites_icon_url_result
-        }"""
-
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def update(self, table_type):
-        hi = "hi"
+        print "Connected to sqlite3 db via Database class"
 
 if __name__ == '__main__':
     conf = {

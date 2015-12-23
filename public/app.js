@@ -1,8 +1,25 @@
+/**HTTP/1.1 500 Internal Server Error 
+function read_database(tables, table_columns) {
+    tables = ["popular_sites", "my_sites"];
+    table_columns = ["site_url", "icon_url"];
+    console.log("reading database");
+    console.log("tables are");
+    console.log(tables);
+    console.log("table_columns are: ");
+    console.log(table_columns);
+    $.post("/read_table", {
+        "tables": tables,
+        "table_columns": table_columns
+    });
+}*/
+
 /** Gets site_url and icon_url return values from popular_sites_data Python function. */
 var get_popular_sites = $.ajax({
     'url': '/popular_sites_data'
 });
 get_popular_sites.done(function(popular_sites) {
+    //table_type = "popular_sites"; // code test
+    //read_database(table_type); // code test
     var popular_sites_site_url_list = popular_sites.site_url;
     var popular_sites_icon_url_list = popular_sites.icon_url;
     var site_urls = [];
@@ -23,15 +40,16 @@ get_popular_sites.done(function(popular_sites) {
 });
 /** Posts site to delete in delete_site Python function. */
 function delete_the_site(site, site_url) {
-        console.log("deleting string")
-        $.post("/delete_site", {
-            "delete_site": site
-        }).done(function delete_the_site() {
-            $("tr").remove(":contains(\'" + site_url + "\')");
-            console.log("." + site_url);
-        });
-    }
-    /** Posts site to add in add_site Python function. */
+    console.log("deleting string");
+    $.post("/delete_site", {
+        "delete_site": site
+    }).done(function delete_the_site() {
+        $("tr").remove(":contains(\'" + site_url + "\')");
+        console.log("." + site_url);
+    });
+}
+
+/** Posts site to add in add_site Python function. */
 $("#add_site_button").click(function(add_site_button_clicked) {
     $.post("/add_site", {
         "add_site": $("input[name='field']").val()
@@ -47,6 +65,8 @@ var get_my_sites = $.ajax({
     'url': '/my_sites_data'
 });
 get_my_sites.done(function(response) {
+    //table_type = "my_sites"; // code test
+    //read_database(table_type); // code test
     var url_list = response.site_url;
     var site_urls = [];
     var j = 0;
