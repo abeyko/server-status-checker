@@ -7,6 +7,7 @@ html {
 }
 
 #b1 {
+    margin-left: 2cm;
     font-family: 'Century Gothic',CenturyGothic,AppleGothic,sans-serif;
     font-style: normal;
     font-variant: normal;
@@ -21,8 +22,9 @@ html {
 }
 
 #b2 {
+    border: 1px solid black;
     margin-top: 30px;
-    margin-left: 10cm;
+    margin-left: 2cm;
 /* Increase this to make the boxes appear a little more to the left  */
     text-align: center;
 /* Centers the font within the width of the box  */
@@ -32,8 +34,8 @@ html {
 /* Sets background to cadet blue, but with transparent opacity of .5  */
     border-radius: 25px;
 /* Rounds the edges  */
-    padding: 10px;
-    width: 800px;
+
+    width: 1200px;
 }
 
 a:link {
@@ -56,5 +58,6 @@ form {
 }
 
 td {
-    font-size: 18px;
+    font-size: 14px;
+    border: 1px solid black;
 }
