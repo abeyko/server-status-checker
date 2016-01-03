@@ -56,6 +56,12 @@ $("#add_site_button").click(function(add_site_button_clicked) {
         console.log("new site was added");
         $("input[name='field']").val('');
         //$('<li>').text('New item').appendTo('.items');
+        //each row of sites table is its own site object
+        //need to pass from cp to js and then I can do the append
+        // it should only ping the new site, not all sites
+        //for site icon, need two buttons, one on add site
+        // and one as a default button in lieu of the missing icon
+        // where once they upload image, button goes away
     });
     add_site_button_clicked.preventDefault();
 });

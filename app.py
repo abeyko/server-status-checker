@@ -3,63 +3,43 @@ import os
 import sqlite3
 import httplib
 import time
-import threading
+from Queue import Queue
+from threading import Thread
 import random
 
-# icon | url | last checked | status icon | ping status | ping_latency | http_status code | weekly stats | delete | ping now 
+global queue
+queue = Queue()
 
 
 class Database(object):
 
     url_list = []
-    """
-    def __init__(self):
-        
-        print 'I AM CONNECTING TO DB'
-        self.connection = sqlite3.connect('sqlite3.db')
-        print 'threading.enumerate  in Database init is'
-        print threading.enumerate()
-        print 'threading.active count in Database init is'
-        print threading.active_count()
-        print 'threading.current in Database init is'
-        print threading.current_thread()
-    """
+
     def initialize_database(self):
         print 'I AM CONNECTING TO DB'
         self.connection = sqlite3.connect('sqlite3.db')
-        print 'threading.enumerate  in Database init is'
-        print threading.enumerate()
-        print 'threading.active count in Database init is'
-        print threading.active_count()
-        print 'threading.current in Database init is'
-        print threading.current_thread()
+
+        while True:
+            if queue.empty():
+                time.sleep(0.5)
+            print 'this is the get'
+            queue.get()
+            queue.task_done()
 
     def read_the_table(self):
         """Returns icon, url, last checked,
         ping status, ping ping_latency,
         and http status from database"""
-        print 'threading.enumerate in Database read_the_table is'
-        print threading.enumerate()
-        print 'threading.active count in Database read_the_table is'
-        print threading.active_count()
-        print 'threading.current in Database read_the_table is'
-        print threading.current_thread()  
-        print 'HEY, THESE ARE THE KEYS'
-        print cherrypy.tree.apps.keys()
-        #connection = sqlite3.connect('sqlite3.db')
         connection = self.connection.cursor()
         connection = connection.execute("SELECT * from sites")
         table = connection.fetchall()
-        print 'This is table'
-        print table
 
-        #global url_list
-        #url_list = []
         icon_list = []
         last_checked_list = []
         ping_status_list = []
         ping_latency_list = []
         http_status_list = []
+        self.url_list = []
 
         for item in table:
             self.url_list.append(item[1])
@@ -70,8 +50,8 @@ class Database(object):
             http_status_list.append(item[6])
 
         connection.close()
-        print "in this method, list is " + str(db.url_list)
-        return {
+        # print "in this method, list is " + str(db.url_list)
+        self.table_prep = {
             'icon_list': icon_list,
             'url_list': db.url_list,
             'last_checked_list': last_checked_list,
@@ -86,8 +66,10 @@ class Database(object):
         Keyword arguments:
         add_site -- the url of the site to be added
         """
-        connection.execute("INSERT INTO sites(site_url) VALUES (?)",
-                           [url])
+        print url
+        self.connection.execute(
+            "INSERT INTO sites (site_url) VALUES (?)", (url,))
+        time.sleep(100)
 
     def delete_a_site(self, url):
         """Delete site from database.
@@ -95,14 +77,19 @@ class Database(object):
         Keyword arguments:
         delete_site -- the url of the site to be deleted
         """
-        connection.execute("DELETE FROM sites WHERE Site_Url=?",
-                               [url])
+        self.connection.execute("DELETE FROM sites WHERE Site_Url=?",
+                                [url])
 
 global db
 db = Database()
+worker = Thread(target=db.initialize_database)
+worker.setDaemon(True)
+worker.start()
+
 
 class Site(object):
     url_list = db.url_list
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def httpredirect(self, url, depth=0):
@@ -160,10 +147,11 @@ class Site(object):
     def site_status(self):
         """Return an up or down status icon after
         checking each url in the database"""
-        time.sleep(10)
+        if len(db.url_list) == 0:
+            time.sleep(1)
         print "For checking purposes: in site_status, list is" + str(db.url_list)
         result_list = []
-        for url in self.url_list:
+        for url in db.url_list:
             ping_item = url
             http_item = url
             print 'THIS IS URL'
@@ -188,72 +176,61 @@ class Site(object):
     """@cherrypy.expose
     @cherrypy.tools.json_out()
     def single_status_check(self):
-        hi = "hi"
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def background_status_check(self):
-        hi = "hi"
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def store_last_status(self):
-        hi = "hi"
-
-    @cherrypy.expose
-    # does cherrpy.expose mean it needs its own thread?
-    @cherrypy.tools.json_out()
-    def icon_upload(self):
-        hi = "hi"
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def add__site(self):
-        db.add_a_site(url)
+    def icon_upload(self):"""
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def delete_site(self):
-        db.delete_a_site(url)"""
+    def add_site(self, url):
+        print 'this is url in add_site'
+        print url
+        # db.add_a_site(url)
+        queue.put(db.add_a_site(url))
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def delete_site(self, url):
+        # db.delete_a_site(url)
+        queue.put(db.delete_a_site(url))
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def read_table(self):
-        print 'DOING THE THING'
-        return db.read_the_table()
+        print 'READING THE TABLE'
+        queue.put(db.read_the_table())
+        time.sleep(1)
+        while db.table_prep == None:
+            time.sleep(0.1)
+        print db.table_prep
+        return db.table_prep
+
 
 class App(object):
-
+    """
     def __init__(self):
         print 'threading.enumerate  in App init is'
         print threading.enumerate()
         print 'threading.active count in App init is'
         print threading.active_count()     
         print 'threading.current in App init is'
-        print threading.current_thread()    
+        print threading.current_thread()
+        """
 
     @cherrypy.expose
     def index(self):
-        db.initialize_database()
-        print 'threading.enumerate  in App index is'
-        print threading.enumerate()
-        print 'threading.active count in App index is'
-        print threading.active_count()
-        print 'threading.current in App index is'
-        print threading.current_thread()  
+        # db.initialize_database()
         return open("./public/Site Monitoring Dashboard.html",
                     'r').read()
-
-    
-def reverse(cls):
-    #return cherrypy.tree.apps.keys()
-    #return dir(cherrypy.tree.apps[''].root)
-    #return dir(cherrypy.tree.apps['/page3/apple'].root)
-    # get link to apple
-    for app_url in cherrypy.tree.apps.keys():
-        if isinstance(cherrypy.tree.apps[app_url].root, cls):
-            # NOTE: it will return with the first instance
-            return app_url
 
 if __name__ == '__main__':
     conf = {
@@ -267,18 +244,10 @@ if __name__ == '__main__':
         }
     }
 
-#cherrypy.app = App()
-#cherrypy.app.site = Site()
-#cherrypy.app.site.database = Database()
-
 app = App()
 app.site = Site()
-#app.site.database = db
 cherrypy.tree.mount(app, '/', conf)
 cherrypy.tree.mount(app.site, '/Site')
-#cherrypy.tree.mount(app.site.database, '/Database')
 
-print 'This is link to site'
-link_to_site = reverse(Site)
 cherrypy.engine.start()
 cherrypy.engine.block()
