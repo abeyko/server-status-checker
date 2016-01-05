@@ -32,7 +32,7 @@ class Database(object):
         and http status from database"""
         table = database_connection(0, "SELECT * from sites")
 
-        icon_lista = []
+        icon_list = []
         last_checked_list = []
         ping_status_list = []
         ping_latency_list = []
@@ -41,14 +41,14 @@ class Database(object):
 
         for item in table:
             db.url_list.append(item[1])
-            icon_lista.append(item[2])
+            icon_list.append(item[2])
             ping_latency_list.append(item[3])
             ping_status_list.append(item[4])
             ping_latency_list.append(item[5])
             http_status_list.append(item[6])
 
         return {
-            'icon_list': icon_lista,
+            'icon_list': icon_list,
             'url_list': db.url_list,
             'last_checked_list': last_checked_list,
             'ping_status_list': ping_status_list,
@@ -86,11 +86,7 @@ db = Database()
 
 class Site(object):
     url_list = db.url_list
-    print 'in site class url list is'
-    print url_list
 
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
     def httpredirect(self, url, depth=0):
         """Handles http redirects. Returns final http status.
 
@@ -163,8 +159,8 @@ class Site(object):
                     or http_status >= 500 or \
                     http_status <= 399 or \
                     http_status == 405:
-                # print http_status
-                # print ping_response
+                print 'http code is ' + str(http_status)
+                print 'ping response' + str(ping_response)
                 result_list.append(u"\u2705")
             else:
                 result_list.append(u"\u274e")

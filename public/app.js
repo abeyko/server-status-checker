@@ -14,6 +14,13 @@ get_sites.done(function(sites) {
     var site_urls = [];
     var img_urls = [];
     var table_string = "";
+    var strings = ["Icon", "Site", "Last Checked", "Status Icon", "Ping Status", "Ping Latency", "HTTP Status", "Weekly Stats", "Delete Site", "Ping Site"];
+    for (i = 0; i < strings.length; i++) {
+        table_string += "<th style=\"color: #FFFFFF\">" + strings[i] + "</th>";
+
+    }
+    new_table_string = "<tr>" + table_string + "</tr>";
+
     for (i = 0; i < urls.length; i++) {
         site_urls.push(urls[i]);
         img_urls.push(icons[i]);
@@ -21,6 +28,8 @@ get_sites.done(function(sites) {
         console.log("IMG URLS ARE");
         console.log(site_urls);
         console.log(img_urls);
+        
+        
         table_string += "<tr><td align=\"center\" width=\"64\">" +
             "<img src=" + img_urls[i] +
             "></td><td style=\"color: #FFFFFF\">" + site_urls[i] +
