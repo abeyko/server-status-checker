@@ -1,6 +1,6 @@
 /** Gets site_url and icon_url return values from popular_sites_data Python function. */
 var get_sites = $.ajax({
-    'url': 'Site/read_table'
+    'url': 'Site/Database/read_the_table'
 });
 get_sites.done(function(sites) {
     console.log('this is sites: ');
@@ -42,7 +42,7 @@ get_sites.done(function(sites) {
 /** Posts site to delete in delete_site Python function. */
 function delete_the_site(site, site_url) {
     console.log("deleting string");
-    $.post("Site/delete_site", {
+    $.post("Site/Database/delete_a_site", {
         "url": site
     }).done(function delete_the_site() {
         $("tr").remove(":contains(\'" + site_url + "\')");
@@ -52,12 +52,14 @@ function delete_the_site(site, site_url) {
 
 /** Posts site to add in add_site Python function. */
 $("#add_site_button").click(function(add_site_button_clicked) {
-    $.post("Site/add_site", {
+    $.post("Site/Database/add_a_site", {
         "url": $("input[name='field']").val()
     }).done(function() {
         console.log("new site was added");
         $("input[name='field']").val('');
+        //$('#sites tr:last').after(table_row);
         //$('<li>').text('New item').appendTo('.items');
+        // the <li> tag defines a list item
     });
     add_site_button_clicked.preventDefault();
 });
