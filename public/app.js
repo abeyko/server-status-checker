@@ -1,8 +1,10 @@
 /** Gets site_url and icon_url return values from popular_sites_data Python function. */
-var get_popular_sites = $.ajax({
+var get_sites = $.ajax({
     'url': 'Site/read_table'
 });
-get_popular_sites.done(function(sites) {
+get_sites.done(function(sites) {
+    console.log('this is sites: ');
+    console.log(sites);
     var urls = sites.url_list;
     console.log("urls is ");
     console.log(urls);
@@ -56,12 +58,6 @@ $("#add_site_button").click(function(add_site_button_clicked) {
         console.log("new site was added");
         $("input[name='field']").val('');
         //$('<li>').text('New item').appendTo('.items');
-        //each row of sites table is its own site object
-        //need to pass from cp to js and then I can do the append
-        // it should only ping the new site, not all sites
-        //for site icon, need two buttons, one on add site
-        // and one as a default button in lieu of the missing icon
-        // where once they upload image, button goes away
     });
     add_site_button_clicked.preventDefault();
 });
