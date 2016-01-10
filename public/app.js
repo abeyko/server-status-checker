@@ -4,7 +4,8 @@ var get_sites = $.ajax({
 });
 get_sites.done(function(sites) {
     var icon_urls = sites.icon_list;
-    var site_urls = sites.url_list;
+    var display_site_urls = sites.display_url_list;
+    var original_site_urls = sites.original_url_list;
     var last_checked = sites.last_checked_list;
     var status_icon = sites.status_icon_list;
     var ping_status = sites.ping_status_list;
@@ -19,10 +20,10 @@ get_sites.done(function(sites) {
     }
     new_table_string = "<tr>" + table_string + "</tr>";
 
-    for (i = 0; i <site_urls.length; i++) {
+    for (i = 0; i <display_site_urls.length; i++) {
         table_string += "<tr><td align=\"center\" width=\"64\">" +
             "<img src=" + icon_urls[i] +
-            "></td><td style=\"color: #FFFFFF\">" + site_urls[i] +
+            "></td><td style=\"color: #FFFFFF\">" + display_site_urls[i] +
             "</td><td style=\"color: #FFFFFF\">" + last_checked[i] +
             "</td><td style=\"font-size:200%\">" + status_icon[i] +
             "</td><td style=\"color: #FFFFFF\">" + ping_status[i] +
@@ -30,11 +31,9 @@ get_sites.done(function(sites) {
             "</td><td style=\"color: #FFFFFF\">" + http_status[i] +
             "</td><td>" +
             "<button type=\"button\" onclick=\"delete_the_site(&#34;" +
-            site_urls[i] + "&#34;, &#34;" + site_urls[i] +
-            "&#34;)\">Delete</button>" + "</td><td>" +
+            original_site_urls[i] + "&#34;)\">Delete</button>" + "</td><td>" +
             "<button type=\"button\" onclick=\"ping_the_site(&#34;" +
-            site_urls[i] + "&#34;, &#34;" + site_urls[i] +
-            "&#34;)\">Ping</button>" + "</td></tr>";
+            original_site_urls[i] + "&#34;)\">Ping</button>" + "</td></tr>";
     }
     document.getElementById("sites").innerHTML = table_string;
     // ever 5 min do a location.reload()
@@ -66,7 +65,8 @@ $("#add_site_button").click(function(add_site_button_clicked) {
 /** Posts site to delete in delete_site Python function. */
 function ping_the_site(site, site_url) {
     console.log("pinging site");
-    $.post("Site/Database/single_status_check", {
+    console.log(site);
+    $.post("Site/check_single", {
         "url": site
     });
 }
