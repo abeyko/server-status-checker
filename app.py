@@ -4,9 +4,15 @@ import sqlite3
 import httplib
 import time
 import datetime
-import apscheduler.scheduler
+from multiprocessing import Process
+from threading import Thread
+#import apscheduler.scheduler
+#from threading import Thread
 import re
 import subprocess
+
+up_symbol = 9989
+down_symbol = 10062
 
 def database_connection(decider, command):
     connection = sqlite3.connect('sqlite3.db')
@@ -23,6 +29,8 @@ def database_connection(decider, command):
         connection.close()
         return "ran"
 
+global background_worker
+background_started = False
 
 class Database(object):
 
@@ -48,11 +56,22 @@ class Database(object):
             icon_list.append(item[1])
             db.url_list.append(item[2])
             last_checked_list.append(item[3])
-            status_icon_list.append(item[4])
+            #status_icon_list.append(unicode(item[4]))
+            status_icon_list.append(unichr(item[4]))
             ping_status_list.append(item[5])
             ping_latency_list.append(item[6])
             http_status_list.append(item[7])
+        print status_icon_list
 
+        global background_started
+        print "Background worker is starting"
+        if not background_started:
+            global background_worker
+            background_worker = Thread(target=update)
+            #background_worker = Process(target=update)
+            background_worker.setDaemon(True)
+            background_worker.start()
+            background_started = True
 
         return {
             'icon_list': icon_list,
@@ -93,8 +112,8 @@ global db
 db = Database()
 global url_list
 url_list = db.url_list
-global site
-site = Site()
+#db.url_list = database_connection(0, "SELECT site_url from sites")
+
 
 class Site(object):
 
@@ -109,6 +128,7 @@ class Site(object):
         body = ""
         if depth > 10:
             raise Exception("Redirected " + depth + "times, giving up.")
+        print "url first is " + str(url)
         if url.startswith('http://'):
             # print "------------------START-------------------"
             # print "LEVEL: " + str(depth)
@@ -129,7 +149,7 @@ class Site(object):
             # print "URL STRIPPED: " + url
             connection = httplib.HTTPSConnection(url)
 
-        #print "url is " + str(url)
+        print "url is " + str(url)
         request = connection.request("HEAD", "/", body, headers)
         response = connection.getresponse()
         # print "STATUS: " + str(response.status)
@@ -163,13 +183,25 @@ class Site(object):
         http_status_list = []
 
         for url in db.url_list:
-            ping_item = url
-            http_item = url
+            print 'url before ping_item is ' + url
+            print 'type for url is ' + str(type(url))
+            bananas = "string"
+            if isinstance(url, unicode):
+                ping_item = str(url)
+            else:
+                ping_item = str(url[0])
+
+            print 'ping_item is ' + ping_item
+            http_item = ping_item
+            url_item = ping_item
             # print 'THIS IS URL'
             # print url
+            print 'ping item or url is ' + str(ping_item)
             if ping_item.startswith('http://'):
                 ping_item = ping_item[7:]
             #ping_response = os.system("ping -c 1 -W 1 " + ping_item)
+            ping_response = 42
+            ping_latency = 5000
             try:
                 ping = subprocess.Popen(["ping", "-n", "-c 1", ping_item], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, error = ping.communicate()
@@ -189,13 +221,9 @@ class Site(object):
                 print "Couldn't get a ping"
             http_status = self.httpredirect(http_item, 0)
 
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            elapsed_time = last_checked - current_time
+            #current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            c_time = time.ctime() # use 
 
-            last_checked_list.append(elapsed_time)           
-            ping_response_list.append(ping_response)
-            ping_latency_list.append(ping_latency)
-            http_status_list.append(http_status)
 
             if ping_response == 1 \
                     or http_status >= 500 or \
@@ -203,27 +231,40 @@ class Site(object):
                     http_status == 405:
                 print 'http code is ' + str(http_status)
                 print 'ping response' + str(ping_response)
-                status_icon = "u2705"
+                global up_symbol
+                global down_symbol
+                status_icon = up_symbol
+                # in show the table in js, just populate table with unicode wrapping the changing variable
                 #status_icon_list.append(u"\u2705") # ONLY PASS IN U2705 AND THEN ADD THE UNICODE BIT JS SIDE
             else:
                 #status_icon_list.append(u"\u274e") # OR PYTHON CAN CONVERT IT BEFORE PASSING TO JS
-                status_icon = "u274e"
-        database_connection(1, "UPDATE sites SET last_checked=elapsed_time, status_icon=status_icon, ping_status=ping_response, ping_latency=ping_latency, http_status=http_status WHERE site_url = (\"" + url + "\") ")
+                status_icon = down_symbol
+            #print "type of icon = " + str(type(status_icon))
+            print "ping response type = " + str(type(ping_response))
+            print "ping latency type = " + str(type(ping_latency))
+            print "http_status type = " + str(type(http_status))
+            print "url type = " + str(url[0])
+            last_checked_list.append(c_time)           
+            ping_response_list.append(ping_response)
+            ping_latency_list.append(ping_latency)
+            http_status_list.append(http_status)
+            executible = "UPDATE sites SET last_checked=  (\"" + str(c_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_status) + "\" WHERE site_url = (\"" + url_item + "\") "
+            print 'executible is ' + str(executible)
+            database_connection(1, executible)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def single_status_check(self):
         single = "check single status here"
 
-"""def update():
+global s
+s = Site()
+
+def update():
     while True:
-        site.background_status_check()
-        time.sleep(5)"""
-
-sched = Scheduler()
-sched.start()
-
-sched.add_job(site.background_status_check, 'interval', seconds = 300)
+        print "update function is running"
+        s.background_status_check()
+        time.sleep(100)
 
 class App(object):
 
@@ -252,3 +293,6 @@ cherrypy.tree.mount(app.site, '/Site')
 cherrypy.tree.mount(app.site.database, '/Site/Database')
 cherrypy.engine.start()
 cherrypy.engine.block()
+
+
+

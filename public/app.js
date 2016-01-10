@@ -24,8 +24,8 @@ get_sites.done(function(sites) {
             "<img src=" + icon_urls[i] +
             "></td><td style=\"color: #FFFFFF\">" + site_urls[i] +
             "</td><td style=\"color: #FFFFFF\">" + last_checked[i] +
-            "</td><td style=\"color: #FFFFFF\">" + status_icon[i] +
-            " style=\"font-size:200%\"></td><td style=\"color: #FFFFFF\">" + ping_status[i] +
+            "</td><td style=\"font-size:200%\">" + status_icon[i] +
+            "</td><td style=\"color: #FFFFFF\">" + ping_status[i] +
             "</td><td style=\"color: #FFFFFF\">" + ping_latency[i] +
             "</td><td style=\"color: #FFFFFF\">" + http_status[i] +
             "</td><td>" +
