@@ -14,7 +14,7 @@ get_sites.done(function(sites) {
     var table_string = "";
     var strings = ["Icon", "Site", "Last Checked", "Status Icon", "Packets Received", "Ping Latency", "HTTP Status", "Delete Site", "Ping Site"];
     for (i = 0; i < strings.length; i++) {
-        table_string += "<th style=\"color: #FFFFFF\">" + strings[i] + "</th>";
+        table_string += "<th style=\"color: #FFFFFF\"><i>" + strings[i] + "</i></th>";
 
     }
     new_table_string = "<tr>" + table_string + "</tr>";
@@ -34,7 +34,7 @@ get_sites.done(function(sites) {
             "&#34;)\">Delete</button>" + "</td><td>" +
             "<button type=\"button\" onclick=\"ping_the_site(&#34;" +
             site_urls[i] + "&#34;, &#34;" + site_urls[i] +
-            "&#34;)\">Ping Now</button>" + "</td></tr>";
+            "&#34;)\">Ping</button>" + "</td></tr>";
     }
     document.getElementById("sites").innerHTML = table_string;
     // ever 5 min do a location.reload()

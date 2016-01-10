@@ -4,9 +4,11 @@ import sqlite3
 import httplib
 import time
 from threading import Thread
+from urlparse import urlparse
 import re
 import subprocess
 import urllib
+import datetime
 
 up_symbol = 9989
 down_symbol = 10062
@@ -43,6 +45,7 @@ class Database(object):
 
         icon_list = []
         db.url_list = []
+        db.url_list2 = []
         last_checked_list = []
         status_icon_list = []
         ping_status_list = []
@@ -68,9 +71,21 @@ class Database(object):
             background_worker.start()
             background_started = True
 
+        for url in db.url_list:
+            #strip url down here
+            o = urlparse(url)
+            domain = o.hostname
+            temp = domain.rsplit('.')
+            if (len(temp) == 3):
+                domain = temp[1] + '.' + temp[2]
+                print 'domain is ' + str(domain)
+
+            db.url_list2.append(domain)
+
+
         return {
             'icon_list': icon_list,
-            'url_list': db.url_list,
+            'url_list': db.url_list2,
             'last_checked_list': last_checked_list,
             'status_icon_list': status_icon_list,
             'ping_status_list': ping_status_list,
@@ -114,32 +129,36 @@ class Site(object):
     def background_status_check(self):
         """Return an up or down status icon after
         checking each url in the database"""
-        if len(db.url_list) == 0:
-            time.sleep(1)
-        print "For checking purposes: in background_status_check, list is" + str(db.url_list)
-        
         status_icon_list = []
         last_checked_list = []
         ping_response_list = []
         ping_latency_list = []
         http_status_list = []
 
+        if len(db.url_list) == 0:
+            time.sleep(1)
+        print "For checking purposes: in background_status_check, list is" + str(db.url_list)
+        
         for url in db.url_list:
             print 'url before ping_item is ' + url
             print 'type for url is ' + str(type(url))
+            # result was unicode here
             if isinstance(url, unicode):
                 ping_item = str(url)
+                print 'if isinstance was unicode, ping item is now ' + str(ping_item)
             else:
                 ping_item = str(url[0])
+                print 'if isinstance was not unicode, ping item is now ' + str(ping_item)
 
-            print 'ping_item is ' + ping_item
             http_item = ping_item
             url_item = ping_item
-            print 'ping item or url is ' + str(ping_item)
-            if ping_item.startswith('http://'):
-                ping_item = ping_item[7:]
+
+            ping_item_parse = urlparse(ping_item)
+            ping_item = ping_item_parse.hostname
+
             ping_response = 42
             ping_latency = 5000
+
             try:
                 ping = subprocess.Popen(["ping", "-n", "-c 1", ping_item], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 out, error = ping.communicate()
@@ -158,6 +177,7 @@ class Site(object):
                         ping_latency = 'None'
                     else:
                         print 'No ping'
+                        #this doens't make sense
 
             except subprocess.CalledProcessError:
                 print "Couldn't get a ping"
@@ -168,7 +188,10 @@ class Site(object):
             print 'final url was ' + str(final_url)
             print 'http code is ' + str(http_code)
 
-            c_time = time.ctime() 
+            #c_time = time.ctime()
+            c_time = time.strftime("%x %X")
+
+            #c_time = datetime.datetime.strptime(time.ctime(), "%x %X") 
 
 
             if ping_response == 1 \
@@ -230,6 +253,3 @@ cherrypy.tree.mount(app.site, '/Site')
 cherrypy.tree.mount(app.site.database, '/Site/Database')
 cherrypy.engine.start()
 cherrypy.engine.block()
-
-
-

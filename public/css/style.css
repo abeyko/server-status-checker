@@ -7,7 +7,7 @@ html {
 }
 
 #b1 {
-    margin-left: 2cm;
+    margin-left: 6cm;
     font-family: 'Century Gothic',CenturyGothic,AppleGothic,sans-serif;
     font-style: normal;
     font-variant: normal;
@@ -22,9 +22,9 @@ html {
 }
 
 #b2 {
-    border: 1px solid gray;
+    padding: 10px;
     margin-top: 30px;
-    margin-left: 2cm;
+    margin-left: 6cm;
 /* Increase this to make the boxes appear a little more to the left  */
     text-align: center;
 /* Centers the font within the width of the box  */
@@ -35,7 +35,7 @@ html {
     border-radius: 25px;
 /* Rounds the edges  */
 
-    width: 1200px;
+    width: 1000px;
 }
 
 a:link {
@@ -48,6 +48,7 @@ caption {
     font-size: 35px;
     color: #FFF;
     margin-top: 30px;
+    padding-bottom: 12px;
     font-weight: 700;
 }
 
@@ -58,11 +59,10 @@ form {
 }
 
 td {
-    font-size: 14px;
-    border: 1px solid gray;
+    font-size: 16px;
+    /* padding: 0; */
 }
 
 th {
-    font-size: 16px;
-    border: 1px solid gray;
+    font-size: 18px;
 }
