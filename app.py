@@ -9,9 +9,14 @@ import re
 import subprocess
 import urllib
 import datetime
+import PIL
+from PIL import Image
 
 up_symbol = 9989
 down_symbol = 10062
+
+localDir = os.path.dirname(__file__)
+absDir = os.path.join(os.getcwd(), localDir)
 
 
 def database_connection(decider, command):
@@ -58,7 +63,11 @@ class Database(object):
             icon_list.append(item[1])
             db.url_list.append(item[2])
             last_checked_list.append(item[3])
-            status_icon_list.append(unichr(item[4]))
+
+            if item[4] != None:
+                status_icon_list.append(unichr(item[4]))
+            else:
+                status_icon_list.append(unichr(0))
             ping_status_list.append(item[5])
             ping_latency_list.append(item[6])
             http_status_list.append(item[7])
@@ -101,7 +110,7 @@ class Database(object):
         """Add site to database.
 
         Keyword arguments:
-        add_site -- the url of the site to be added
+        url -- the url of the site to be added
         """
         url = str(url)
         print 'the url that was added is'
@@ -114,11 +123,37 @@ class Database(object):
         """Delete site from database.
 
         Keyword arguments:
-        delete_site -- the url of the site to be deleted
+        url -- the url of the site to be deleted
         """
         database_connection(
             1, "DELETE FROM sites WHERE Site_Url= \"" + url + "\"")
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def upload(self, myFile, url):
+        """Add image icon url to database.
+        Keyword arguments:
+        myFile -- the uploaded file
+        url -- the associated url to add image icon to in database
+        """
+        url = str(url)
+        url2 = url.strip('.com')
+        url_item_parse = urlparse(url)
+        url_item = url_item_parse.hostname
+        size = 0
+        newDir = absDir + "public/icons/"
+        img = Image.open(myFile.file)
+        img = img.resize((64, 64), PIL.Image.ANTIALIAS)
+        file_name = url_item + ".jpg"
+        save_this = newDir + file_name
+        print save_this
+        img.save(save_this)
+        print 'absDir is ' + str(absDir)
+        file_path = "static/icons/" + file_name
+
+        executible = "UPDATE sites SET icon_url=  (\"" + str(
+            file_path) + "\") WHERE site_url = (\"" + url + "\") "
+        database_connection(1, executible)
 
 global db
 db = Database()
@@ -136,10 +171,10 @@ class Site(object):
         # result was unicode here
         if isinstance(url, unicode):
             ping_item = str(url)
-            print 'if isinstance was unicode, ping item is now ' + str(ping_item)
+            print 'was unicode, ping item is now ' + str(ping_item)
         else:
             ping_item = str(url[0])
-            print 'if isinstance was not unicode, ping item is now ' + str(ping_item)
+            print 'was not unicode, ping item is now ' + str(ping_item)
         http_item = ping_item
         url_item = ping_item
         ping_item_parse = urlparse(ping_item)
@@ -148,7 +183,8 @@ class Site(object):
         ping_latency = 5000
         try:
             ping = subprocess.Popen(
-                ["ping", "-n", "-c 1", ping_item], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ["ping", "-n", "-c 1", ping_item],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, error = ping.communicate()
             print 'ping is ' + str(ping)
             print 'out is ' + str(out)
@@ -166,7 +202,7 @@ class Site(object):
                     ping_latency = 'None'
                 else:
                     print 'No ping'
-                    # this doens't make sense
+
         except subprocess.CalledProcessError:
             print "Couldn't get a ping"
         open_url = urllib.urlopen(http_item)
@@ -184,8 +220,12 @@ class Site(object):
             status_icon = up_symbol
         else:
             status_icon = down_symbol
-        executible = "UPDATE sites SET last_checked=  (\"" + str(c_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(
-            ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_code) + "\" WHERE site_url = (\"" + url_item + "\") "
+        executible = "UPDATE sites SET last_checked=  (\"" + str(
+            c_time) + "\"), status_icon= (\"" + str(
+            status_icon) + "\"), ping_status= (\"" + str(
+            ping_response) + "\"), ping_latency= (\"" + str(
+            ping_latency) + "\"), http_status= \"" + str(
+            http_code) + "\" WHERE site_url = (\"" + url_item + "\") "
         print 'executible is ' + str(executible)
         database_connection(1, executible)
 
@@ -195,7 +235,7 @@ class Site(object):
 
         if len(db.url_list) == 0:
             time.sleep(1)
-        print "For checking purposes: in background_status_check, list is" + str(db.url_list)
+        print "background_status_check, list is" + str(db.url_list)
 
         for url in db.url_list:
             self.check_single(url)

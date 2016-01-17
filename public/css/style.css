@@ -25,16 +25,10 @@ html {
     padding: 10px;
     margin-top: 30px;
     margin-left: 6cm;
-/* Increase this to make the boxes appear a little more to the left  */
     text-align: center;
-/* Centers the font within the width of the box  */
     font-family: 'Century Gothic',CenturyGothic,AppleGothic,sans-serif;
-/* Sets the font */
     background-color: rgba(95,158,160,0.5);
-/* Sets background to cadet blue, but with transparent opacity of .5  */
     border-radius: 25px;
-/* Rounds the edges  */
-
     width: 1000px;
 }
 
@@ -60,7 +54,6 @@ form {
 
 td {
     font-size: 16px;
-    /* padding: 0; */
 }
 
 th {
