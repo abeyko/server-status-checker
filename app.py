@@ -12,6 +12,10 @@ import datetime
 import PIL
 from PIL import Image
 
+# need to turn logging on when starting program up for first time:
+# python app.py  logheavy
+# python app.py  nolog
+
 up_symbol = 9989
 down_symbol = 10062
 
@@ -83,14 +87,15 @@ class Database(object):
             background_started = True
 
         for url in db.url_list:
-            # strip url down here
             o = urlparse(url)
-            domain = o.hostname
-            temp = domain.rsplit('.')
-            if (len(temp) == 3):
-                domain = temp[1] + '.' + temp[2]
-                print 'domain is ' + str(domain)
-
+            hostname = o.hostname
+            print 'hostname is ' + str(hostname)
+            path = o.path
+            print 'path is ' + str(path)
+            domain = hostname + path
+            print 'domain in urljoin is ' + str(domain)
+            if domain.startswith('www.'):
+                domain = domain[4:]
             db.url_list2.append(domain)
 
         return {
