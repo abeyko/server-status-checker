@@ -25,7 +25,7 @@ get_sites.done(function(sites) {
     for (i = 0; i < display_site_urls.length; i++) {
         if (icon_urls[i] == null) {
             source =
-                "<form action=\"Site/Database/upload\" method=\"post\" target=None enctype=\"multipart/form-data\">" +
+                "<form action=\"Site/Database/upload_icon\" method=\"post\" target=None enctype=\"multipart/form-data\">" +
                 "<input type=\"text\" name=\"url\" id=\"uploader" + i +
                 "\" value=\"" + original_site_urls[i] +
                 "\" style = display:none;/> " +

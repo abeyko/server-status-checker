@@ -11,97 +11,96 @@ import urllib
 import datetime
 import PIL
 from PIL import Image
+import logging
+import sys
 
-# need to turn logging on when starting program up for first time:
-# python app.py  logheavy
-# python app.py  nolog
 
-up_symbol = 9989
-down_symbol = 10062
+for arg in sys.argv:
+    loglevel = str(arg) 
+    if loglevel.startswith('--log='):
+        loglevel = loglevel[6:]
+        print 'numeric_level is ' + str(loglevel)
+        loglevel = loglevel.upper()
+        print 'new numeric level is ' + str(loglevel)
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=loglevel)
+
 
 localDir = os.path.dirname(__file__)
 absDir = os.path.join(os.getcwd(), localDir)
 
 
-def database_connection(decider, command):
+def database_connection(method, command):
+    """Connects to database and selects or
+    updates data.
+
+    Keyword arguments:
+    method -- database method
+    command -- database command
+    """
+    logging.info('database_connection: Started')
     connection = sqlite3.connect('sqlite3.db')
-    if decider == 0:
+    if method == 'select_data':
         connection = connection.cursor()
+        logging.info('command is %s', command)
         connection.execute(command)
-        fetch = connection.fetchall()
+        fetched_data = connection.fetchall()
         connection.close()
-        return fetch
-    if decider == 1:
-        print command
+        logging.info('database_connection: Finished Selecting Data')
+        return fetched_data
+    if method == 'update_data':
+        logging.info('command is %s', command)
         connection.execute(command)
         connection.commit()
         connection.close()
-        return "ran"
-
-global background_worker
-background_started = False
+        logging.info('database_connection: Finished Updating Data')
 
 
 class Database(object):
 
-    url_list = []
+    original_url_list = []
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def read_the_table(self):
-        """Returns icon, url, last checked,
-        ping status, ping ping_latency,
+        """Returns sites' icon, url, last
+        checked, ping status, ping latency,
         and http status from database"""
-        table = database_connection(0, "SELECT * from sites")
-
+        logging.info('Database:read_the_table: Started')
+        table = database_connection('select_data', "SELECT * from sites")
         icon_list = []
-        db.url_list = []
-        db.url_list2 = []
+        database.display_url_list = []
+        database.original_url_list = []
         last_checked_list = []
         status_icon_list = []
         ping_status_list = []
         ping_latency_list = []
         http_status_list = []
-
-        for item in table:
-            icon_list.append(item[1])
-            db.url_list.append(item[2])
-            last_checked_list.append(item[3])
-
-            if item[4] != None:
-                status_icon_list.append(unichr(item[4]))
+        logging.info('table is %s', table)
+        for row in table:
+            icon_list.append(row[1])
+            database.original_url_list.append(row[2])
+            last_checked_list.append(row[3])
+            if row[4] != None:
+                status_icon_list.append(unichr(row[4]))
             else:
                 status_icon_list.append(unichr(0))
-            ping_status_list.append(item[5])
-            ping_latency_list.append(item[6])
-            http_status_list.append(item[7])
-        print status_icon_list
-
-        global background_started
-        print "Background worker is starting"
-        if not background_started:
-            global background_worker
-            background_worker = Thread(target=background_status_check)
-            background_worker.setDaemon(True)
-            background_worker.start()
-            background_started = True
-
-        for url in db.url_list:
-            o = urlparse(url)
-            hostname = o.hostname
-            print 'hostname is ' + str(hostname)
-            path = o.path
-            print 'path is ' + str(path)
+            ping_status_list.append(row[5])
+            ping_latency_list.append(row[6])
+            http_status_list.append(row[7])
+        for url in database.original_url_list:
+            parsed_url = urlparse(url)
+            hostname = parsed_url.hostname
+            path = parsed_url.path
             domain = hostname + path
-            print 'domain in urljoin is ' + str(domain)
             if domain.startswith('www.'):
                 domain = domain[4:]
-            db.url_list2.append(domain)
-
+            database.display_url_list.append(domain)
+        logging.info('display url list is %s', database.display_url_list)
+        logging.info('Database:read_the_table: Finished')
         return {
             'icon_list': icon_list,
-            'display_url_list': db.url_list2,
-            'original_url_list': db.url_list,
+            'display_url_list': database.display_url_list,
+            'original_url_list': database.original_url_list,
             'last_checked_list': last_checked_list,
             'status_icon_list': status_icon_list,
             'ping_status_list': ping_status_list,
@@ -117,10 +116,12 @@ class Database(object):
         Keyword arguments:
         url -- the url of the site to be added
         """
-        url = str(url)
-        print 'the url that was added is'
+        logging.info('Database:add_a_site: Started')
+        url = str(url) # does this need to be here?
+        logging.info('The url that is being added is %s', url)
         database_connection(
-            1, "INSERT INTO sites (site_url) VALUES (\"" + url + "\")")
+            'update_data', "INSERT INTO sites (site_url) VALUES (\"" + url + "\")")
+        logging.info('Database:add_a_site: Finished')
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -130,40 +131,46 @@ class Database(object):
         Keyword arguments:
         url -- the url of the site to be deleted
         """
+        logging.info('Database:delete_a_site: Started')
+        logging.info('The url that is being deleted is %s', url)
         database_connection(
-            1, "DELETE FROM sites WHERE Site_Url= \"" + url + "\"")
+            'update_data', "DELETE FROM sites WHERE Site_Url= \"" + url + "\"")
+        logging.info('Database:delete_a_site: Finished')
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def upload(self, myFile, url):
-        """Add image icon url to database.
+    def upload_icon(self, myFile, url):
+        """Upload image icon url in database.
+
         Keyword arguments:
         myFile -- the uploaded file
-        url -- the associated url to add image icon to in database
+        url -- the url whose image icon is being added to database
         """
-        url = str(url)
-        url2 = url.strip('.com')
+        logging.info('Database:upload_icon: Started')
+        url = str(url) # does this need to be here?
         url_item_parse = urlparse(url)
-        url_item = url_item_parse.hostname
+        url_item_hostname = url_item_parse.hostname # repeat
+        url_item_path = url_item_parse.path #repeated type of code from above
+        full_url = url_item_hostname + url_item_path
         size = 0
         newDir = absDir + "public/icons/"
         img = Image.open(myFile.file)
         img = img.resize((64, 64), PIL.Image.ANTIALIAS)
-        file_name = url_item + ".jpg"
+        file_name = full_url + ".jpg"
         save_this = newDir + file_name
-        print save_this
+        logging.info('Saving: %s', save_this)
         img.save(save_this)
-        print 'absDir is ' + str(absDir)
         file_path = "static/icons/" + file_name
-
+        logging.info('File path being uploaded is: %s', file_path)
         executible = "UPDATE sites SET icon_url=  (\"" + str(
             file_path) + "\") WHERE site_url = (\"" + url + "\") "
-        database_connection(1, executible)
+        database_connection('update_data', executible)
+        logging.info('Database:upload_icon: Finished')
 
-global db
-db = Database()
-global url_list
-url_list = db.url_list
+#global database
+#global url_list
+database = Database()
+url_list = database.original_url_list
 
 
 class Site(object):
@@ -171,15 +178,20 @@ class Site(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def check_single(self, url):
-        print 'url before ping_item is ' + url
-        print 'type for url is ' + str(type(url))
-        # result was unicode here
+        """Pings and http requests a single site.
+        Updates database with up or down icon
+        status code.
+
+        Keyword arguments:
+        url -- the url to be checked
+        """
+        logging.info('Site:check_single: Started')
         if isinstance(url, unicode):
             ping_item = str(url)
-            print 'was unicode, ping item is now ' + str(ping_item)
+            logging.info('is unicode, ping item now: %s', ping_item)
         else:
             ping_item = str(url[0])
-            print 'was not unicode, ping item is now ' + str(ping_item)
+            logging.info('not unicode, ping item now: %s', ping_item)
         http_item = ping_item
         url_item = ping_item
         ping_item_parse = urlparse(ping_item)
@@ -191,75 +203,91 @@ class Site(object):
                 ["ping", "-n", "-c 1", ping_item],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, error = ping.communicate()
-            print 'ping is ' + str(ping)
-            print 'out is ' + str(out)
             if out:
                 try:
                     ping_latency = int(re.findall(r"time=(\d+)", out)[0])
                     ping_response = int(re.findall(
                         r"(\d+) packets received", out)[0])
-                    print 'packets recieved are ' + str(ping_response)
-                    print "ping latency type = " + str(ping_latency)
-                    print 'time is ' + str(time) + 'ms'
+                    logging.info('Pinging site: %s', ping_item)
+                    logging.info('Packets received: %s', ping_response)
+                    logging.info('Ping latency: %s', ping_latency)
+                    logging.info('Time in ms: %s', time)
                 except:
-                    print "error occurred finding time"
+                    logging.warning('error occurred finding time')
                     ping_response = 0
                     ping_latency = 'None'
-                else:
-                    print 'No ping'
 
         except subprocess.CalledProcessError:
-            print "Couldn't get a ping"
+            logging.warning('check_single: Could not get a ping')
         open_url = urllib.urlopen(http_item)
         final_url = open_url.geturl()
         http_code = open_url.getcode()
-        print 'final url was ' + str(final_url)
-        print 'http code is ' + str(http_code)
-        c_time = time.strftime("%x %X")
+        current_time = time.strftime("%x %X")
+        logging.info('Final HTTP url: %s', final_url)
+        logging.info('HTTP status code: %s', http_code)
+        logging.info('Current time: %s', current_time)
         if ping_response == 1 \
                 or http_code >= 500 or \
                 http_code <= 399 or \
                 http_code == 405:
-            global up_symbol
-            global down_symbol
+            up_symbol = 9989
+            down_symbol = 10062
             status_icon = up_symbol
         else:
             status_icon = down_symbol
-        executible = "UPDATE sites SET last_checked=  (\"" + str(
-            c_time) + "\"), status_icon= (\"" + str(
-            status_icon) + "\"), ping_status= (\"" + str(
-            ping_response) + "\"), ping_latency= (\"" + str(
-            ping_latency) + "\"), http_status= \"" + str(
-            http_code) + "\" WHERE site_url = (\"" + url_item + "\") "
-        print 'executible is ' + str(executible)
-        database_connection(1, executible)
+        executible = "UPDATE sites SET last_checked=  (\"" + str(current_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_code) + "\" WHERE site_url = (\"" + url_item + "\")"
+        database_connection('update_data', executible)
+        logging.info('Site:check_single: Finished')
 
     def check_all(self, url_list):
-        """Return an up or down status icon after
-        checking each url in the database"""
+        """Checks status for all sites.
 
-        if len(db.url_list) == 0:
+        Keyword arguments:
+        url_list -- list of urls to be checked
+        """
+        logging.info('Site:check_all: Started')
+        if len(database.original_url_list) == 0:
             time.sleep(1)
-        print "background_status_check, list is" + str(db.url_list)
-
-        for url in db.url_list:
+        logging.info('Original database url list: %s', database.original_url_list)
+        for url in database.original_url_list:
             self.check_single(url)
+        logging.info('Site:check_all: Finished')
 
-global s
-s = Site()
-
+#global s
+site = Site()
 
 def background_status_check():
+    """Checks site status in the background"""
+    logging.info('background_status_check: Started')
     while True:
-        print "update function is running"
-        s.check_all(db.url_list)
+        site.check_all(database.original_url_list)
         time.sleep(10)
+
+def background_worker():
+    """Opens new thread for checking 
+    site status in background"""
+    logging.info('background_worker: Started')
+    database.read_the_table()
+    #global background_check_started 
+    #if not background_check_started:
+    global background_task # try and remove and see if thread continues to run
+    logging.info('Opening new thread')
+    background_task = Thread(target=background_status_check)
+    background_task.setDaemon(True)
+    background_task.start()
+    logging.info('background_worker: Finished')
+    #background_check_started = True
+
+logging.info('Calling background_worker function...')
+background_worker()
 
 
 class App(object):
 
     @cherrypy.expose
     def index(self):
+        """Returns html page."""
+        logging.info('App:index: Started')
         return open("./public/Site Monitoring Dashboard.html",
                     'r').read()
 
