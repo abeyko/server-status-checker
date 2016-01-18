@@ -119,7 +119,8 @@ class Database(object):
         logging.info('Database:add_a_site: Started')
         logging.info('The url that is being added is %s', url)
         database_connection(
-            'update_data', "INSERT INTO sites (site_url) VALUES (\"" + url + "\")")
+            'update_data',
+            "INSERT INTO sites (site_url) VALUES (\"" + url + "\")")
         logging.info('Database:add_a_site: Finished')
 
     @cherrypy.expose
@@ -233,8 +234,12 @@ class Site(object):
         else:
             down_symbol = 10062
             status_icon = down_symbol
-        executible = "UPDATE sites SET last_checked=  (\"" + str(current_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(
-            ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_code) + "\" WHERE site_url = (\"" + url_item + "\")"
+        executible = "UPDATE sites SET last_checked=  (\"" + str(
+            current_time) + "\"), status_icon= (\"" + str(
+            status_icon) + "\"), ping_status= (\"" + str(
+            ping_response) + "\"), ping_latency= (\"" + str(
+            ping_latency) + "\"), http_status= \"" + str(
+            http_code) + "\" WHERE site_url = (\"" + url_item + "\")"
         database_connection('update_data', executible)
         logging.info('Site:check_single: Finished')
 
