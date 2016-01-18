@@ -16,7 +16,7 @@ import sys
 
 
 for arg in sys.argv:
-    loglevel = str(arg) 
+    loglevel = str(arg)
     if loglevel.startswith('--log='):
         loglevel = loglevel[6:]
         print 'numeric_level is ' + str(loglevel)
@@ -117,7 +117,6 @@ class Database(object):
         url -- the url of the site to be added
         """
         logging.info('Database:add_a_site: Started')
-        url = str(url) # does this need to be here?
         logging.info('The url that is being added is %s', url)
         database_connection(
             'update_data', "INSERT INTO sites (site_url) VALUES (\"" + url + "\")")
@@ -147,10 +146,9 @@ class Database(object):
         url -- the url whose image icon is being added to database
         """
         logging.info('Database:upload_icon: Started')
-        url = str(url) # does this need to be here?
         url_item_parse = urlparse(url)
-        url_item_hostname = url_item_parse.hostname # repeat
-        url_item_path = url_item_parse.path #repeated type of code from above
+        url_item_hostname = url_item_parse.hostname
+        url_item_path = url_item_parse.path
         full_url = url_item_hostname + url_item_path
         size = 0
         newDir = absDir + "public/icons/"
@@ -167,8 +165,6 @@ class Database(object):
         database_connection('update_data', executible)
         logging.info('Database:upload_icon: Finished')
 
-#global database
-#global url_list
 database = Database()
 url_list = database.original_url_list
 
@@ -195,12 +191,14 @@ class Site(object):
         http_item = ping_item
         url_item = ping_item
         ping_item_parse = urlparse(ping_item)
-        ping_item = ping_item_parse.hostname
+        ping_item_hostname = ping_item_parse.hostname
+        ping_item_path = ping_item_parse.path
+        full_ping_item = ping_item_hostname + ping_item_path
         ping_response = 42
         ping_latency = 5000
         try:
             ping = subprocess.Popen(
-                ["ping", "-n", "-c 1", ping_item],
+                ["ping", "-n", "-c 1", full_ping_item],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, error = ping.communicate()
             if out:
@@ -208,7 +206,7 @@ class Site(object):
                     ping_latency = int(re.findall(r"time=(\d+)", out)[0])
                     ping_response = int(re.findall(
                         r"(\d+) packets received", out)[0])
-                    logging.info('Pinging site: %s', ping_item)
+                    logging.info('Pinging site: %s', full_ping_item)
                     logging.info('Packets received: %s', ping_response)
                     logging.info('Ping latency: %s', ping_latency)
                     logging.info('Time in ms: %s', time)
@@ -231,11 +229,12 @@ class Site(object):
                 http_code <= 399 or \
                 http_code == 405:
             up_symbol = 9989
-            down_symbol = 10062
             status_icon = up_symbol
         else:
+            down_symbol = 10062
             status_icon = down_symbol
-        executible = "UPDATE sites SET last_checked=  (\"" + str(current_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_code) + "\" WHERE site_url = (\"" + url_item + "\")"
+        executible = "UPDATE sites SET last_checked=  (\"" + str(current_time) + "\"), status_icon= (\"" + str(status_icon) + "\"), ping_status= (\"" + str(
+            ping_response) + "\"), ping_latency= (\"" + str(ping_latency) + "\"), http_status= \"" + str(http_code) + "\" WHERE site_url = (\"" + url_item + "\")"
         database_connection('update_data', executible)
         logging.info('Site:check_single: Finished')
 
@@ -248,13 +247,14 @@ class Site(object):
         logging.info('Site:check_all: Started')
         if len(database.original_url_list) == 0:
             time.sleep(1)
-        logging.info('Original database url list: %s', database.original_url_list)
+        logging.info('Original database url list: %s',
+                     database.original_url_list)
         for url in database.original_url_list:
             self.check_single(url)
         logging.info('Site:check_all: Finished')
 
-#global s
 site = Site()
+
 
 def background_status_check():
     """Checks site status in the background"""
@@ -263,20 +263,17 @@ def background_status_check():
         site.check_all(database.original_url_list)
         time.sleep(10)
 
+
 def background_worker():
-    """Opens new thread for checking 
+    """Opens new thread for checking
     site status in background"""
     logging.info('background_worker: Started')
     database.read_the_table()
-    #global background_check_started 
-    #if not background_check_started:
-    global background_task # try and remove and see if thread continues to run
     logging.info('Opening new thread')
     background_task = Thread(target=background_status_check)
     background_task.setDaemon(True)
     background_task.start()
     logging.info('background_worker: Finished')
-    #background_check_started = True
 
 logging.info('Calling background_worker function...')
 background_worker()
