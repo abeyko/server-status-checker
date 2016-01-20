@@ -1,4 +1,4 @@
-/** Gets site_url and icon_url return values from popular_sites_data Python function. */
+/** Gets return values from read_the_table Python function and generates table. */
 var get_sites = $.ajax({
     'url': 'Site/Database/read_the_table'
 });
@@ -53,9 +53,9 @@ get_sites.done(function(sites) {
             "</td></tr>";
     }
     document.getElementById("sites").innerHTML = table_string;
-    // every 5 min do a location.reload()
+
 });
-/** Posts site to delete in delete_site Python function. */
+/** Posts site as url in delete_a_site Python function. */
 function delete_the_site(site, site_url) {
         console.log("deleting string");
         $.post("Site/Database/delete_a_site", {
@@ -65,7 +65,7 @@ function delete_the_site(site, site_url) {
             console.log("." + site);
         });
     }
-    /** Posts site to add in add_site Python function. */
+/** Posts site as url in add_a_site Python function. */
 $("#add_site_button").click(function(add_site_button_clicked) {
     $.post("Site/Database/add_a_site", {
         "url": $("input[name='field']").val()
@@ -75,7 +75,7 @@ $("#add_site_button").click(function(add_site_button_clicked) {
     });
     add_site_button_clicked.preventDefault();
 });
-/** Posts site to update stats on in check_single Python function. */
+/** Posts site as url in ping_the_site Python function. */
 function ping_the_site(site) {
     console.log("pinging site");
     console.log(site);
